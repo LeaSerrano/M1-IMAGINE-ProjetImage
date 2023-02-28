@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <cmath>
 
+#include <string>
+
 using namespace std;
 
 struct Color
@@ -107,8 +109,8 @@ public:
 	bool getColor() { return color; };
 	unsigned char *getData() { return data; };
 
-	void load(char *filename);
-	bool save(char *filename);
+	void load(char *filename); void load(string path);
+	bool save(char *filename); bool save(string path);
 
 	ImageBase *getPlan(PLAN plan);
 

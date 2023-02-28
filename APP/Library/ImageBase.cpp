@@ -75,6 +75,11 @@ void ImageBase::reset()
 	isValid = false;
 }
 
+void ImageBase::load(string path)
+{
+	load((char*)path.c_str());
+}
+
 void ImageBase::load(char *filename)
 {
 	init();
@@ -118,6 +123,11 @@ void ImageBase::load(char *filename)
 	dataD = (double*)malloc(sizeof(double) * nTaille);
 
 	isValid = true;
+}
+
+bool ImageBase::save(string path)
+{
+	return save((char*)path.c_str());
 }
 
 bool ImageBase::save(char *filename)
