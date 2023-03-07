@@ -42,12 +42,5 @@ void MapManager::getHeightMap(int width, int height) {
 }
 
 void MapManager::applyHeightMap(int width, int height) {
-
-    /*for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-           
-        }
-    }*/
-
-    maps["RESULT"] = maps["HEIGHT"]; 
+    maps["HEIGHT_SEUIL"] = HeighMap::seuilHeightMap(maps["HEIGHT"]); 
 }

@@ -39,8 +39,10 @@ int main(int argc, char **argv)
 	}
 
 	mapManager->getHeightMap(512, 512);
-
 	mapManager->saveMap("HEIGHT");
+
+	mapManager->applyHeightMap(512, 512);
+	mapManager->saveMap("HEIGHT_SEUIL");
 
 	dataManager->display();
 

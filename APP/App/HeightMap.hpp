@@ -56,4 +56,28 @@ public:
         return heightMap;
     }
 
+    static ImageBase* seuilHeightMap(ImageBase* heightMap) {
+        int width = heightMap->getWidth();
+        int height = heightMap->getHeight();
+
+        float seaLevel = 0.5;
+
+        for(int y = 0; y < height ; y++)
+        {
+            for(int x = 0; x < width; x++)
+            {
+                float value = heightMap->get(x, y, 0)/255.0;
+
+                if (value < seaLevel) {
+                    value = pow(value, 1.2);
+                    value *= 255;
+
+                    heightMap->set(x, y, 0, value);
+                }
+            }
+        }
+
+        return heightMap;
+    }
+
 };
