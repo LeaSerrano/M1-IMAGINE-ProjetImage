@@ -1,5 +1,4 @@
-#ifndef MAPMANAGER
-#define MAPMANAGER
+#pragma once
 
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
@@ -8,7 +7,6 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
-#include <filesystem>
 
 #include <map>
 #include <string>
@@ -16,17 +14,16 @@
 using namespace std;
 using namespace siv;
 
-class MapManager
+class HeighMap
 {
-private:
-
-    map<string,ImageBase*> maps;
 
 public:
 
-    uint32_t seed() {return (rand() / RAND_MAX) * pow(2,32); }
+    static uint32_t seed() {
+        return (rand() / RAND_MAX) * pow(2,32); 
+    }
 
-    void generateHeightMap(int width, int height)
+    static ImageBase* generateHeightMap(int width, int height)
     {
         ImageBase* heightMap = new ImageBase(width,height,false);
 
@@ -49,24 +46,14 @@ public:
             }
         }
 
-        maps["HEIGHT"] = heightMap;
+        return heightMap;
     }
 
-    void saveMap(string id);
-
-    void loadMap(string name);
-
-    void getHeightMap(int width, int height);
-
-    void applyHeightMap(int width, int height);
-
-    MapManager()
+    HeighMap()
     {
         instance = this;
-        srand (time(NULL));
+        srand(time(NULL));
     }
 
-    inline static MapManager* instance;
+    inline static HeighMap* instance;
 };
-
-#endif

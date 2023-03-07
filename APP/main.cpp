@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 		projectManager = new ProjectManager();
 	}
 
-	mapManager->generateHeightMap(512,512);
+	mapManager->getHeightMap(512, 512);
 
 	mapManager->saveMap("HEIGHT");
 

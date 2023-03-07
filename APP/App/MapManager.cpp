@@ -9,6 +9,7 @@
 
 #include "ProjectManager.h"
 #include "MapManager.h"
+#include "HeightMap.hpp"
 
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
@@ -34,4 +35,19 @@ void MapManager::loadMap(string file)
     img->load(path);
 
    	maps.insert_or_assign(id,img);
+}
+
+void MapManager::getHeightMap(int width, int height) {
+    maps["HEIGHT"] = HeighMap::generateHeightMap(width, height);
+}
+
+void MapManager::applyHeightMap(int width, int height) {
+
+    /*for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+           
+        }
+    }*/
+
+    maps["RESULT"] = maps["HEIGHT"]; 
 }
