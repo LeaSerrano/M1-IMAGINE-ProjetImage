@@ -24,7 +24,9 @@ private:
 
 public:
 
-    uint32_t seed() {return (rand() / RAND_MAX) * pow(2,32); }
+    static uint32_t seed() {
+        return (int)((rand() / (float)RAND_MAX) * pow(2,32)); 
+    }
 
     void generateHeightMap(int width, int height)
     {
@@ -63,7 +65,6 @@ public:
     MapManager()
     {
         instance = this;
-        srand (time(NULL));
     }
 
     inline static MapManager* instance;

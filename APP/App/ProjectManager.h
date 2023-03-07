@@ -19,12 +19,15 @@ private:
 public:
 
     const string projectPath() {return currentProjectPath;}
-    const string projectFilePath() { return currentProjectPath + "/" + "project.dat";}
+    const string projectFilePath() { return currentProjectPath + "/" + "project.txt";}
 
     bool loadProject();
     void createProject();
 
     void loadMaps();
+
+    void loadData();
+    void saveData();
 
     void setup(string path)
     {            

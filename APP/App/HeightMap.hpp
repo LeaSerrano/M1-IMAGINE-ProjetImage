@@ -2,6 +2,7 @@
 
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
+#include "MapManager.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,41 +20,40 @@ class HeighMap
 
 public:
 
-    static uint32_t seed() {
-        return (rand() / RAND_MAX) * pow(2,32); 
-    }
-
-    static ImageBase* generateHeightMap(int width, int height)
+    static ImageBase* generatePerlin(int width, int height, double scale, int octaves)
     {
-        ImageBase* heightMap = new ImageBase(width,height,false);
+        uint32_t s = MapManager::seed();
+        const PerlinNoise perlin{s};
+        double fr = 1.0 / scale;
+        
+        ImageBase* map = new ImageBase(width,height,false);
 
-        double frequency = 16.0;
-        clamp(frequency, 0.1, 64.0);
-
-        int32_t octaves = 1;
-        octaves = clamp(octaves, 1, 16);
-
-        const PerlinNoise perlin{seed()};
-
-        double fx = frequency / width; double fy = frequency / height;
+        double fx = fr / width; double fy = fr / height;
 
         for(int y = 0; y < height ; y++)
         {
             for(int x = 0; x < width; x++)
             {
                 double v = perlin.octave2D_01(x*fx,y*fy,octaves);
-                heightMap->set(x,y,0,v*255);
+                map->set(x,y,0,v*255);
             }
+        }
+
+        return map;
+    }
+
+    static ImageBase* generateHeightMap(int width, int height)
+    {
+        ImageBase* heightMap = new ImageBase(width,height,false);
+
+        ImageBase* large = generatePerlin(width,height,0.25,1);
+
+        for(int i = 0; i < heightMap->getSize(); i++)
+        {
+            heightMap->set(i,0,large->get(i,0));
         }
 
         return heightMap;
     }
 
-    HeighMap()
-    {
-        instance = this;
-        srand(time(NULL));
-    }
-
-    inline static HeighMap* instance;
 };

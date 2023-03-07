@@ -3,6 +3,7 @@
 
 #include "App/MapManager.h"
 #include "App/ProjectManager.h"
+#include "App/DataManager.hpp"
 
 #include <cassert>
 #include <stdio.h>
@@ -18,9 +19,14 @@ using namespace siv;
 
 MapManager* mapManager;
 ProjectManager* projectManager;
+DataManager* dataManager;
 
 int main(int argc, char **argv)
 {
+	srand (time(NULL));
+
+	dataManager = new DataManager();
+
 	mapManager = new MapManager();
 
 	if(argc >= 2)
@@ -35,6 +41,10 @@ int main(int argc, char **argv)
 	mapManager->getHeightMap(512, 512);
 
 	mapManager->saveMap("HEIGHT");
+
+	dataManager->display();
+
+	projectManager->saveData();
 
 	return 0;
 }
