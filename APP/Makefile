@@ -8,6 +8,8 @@ BIN=main
 # liste des fichiers sources 
 MAIN=main.cpp
 IMAGE=Library/ImageBase.cpp
+MAPMANAGER=App/MapManager.cpp
+PROJECTMANAGER=App/ProjectManager.cpp
 
 default: $(BIN)
 
@@ -18,7 +20,7 @@ default: $(BIN)
 obj/%.o: %.c
 	gcc -Wall -Iinclude -c $< -o $@
 
-main: $(MAIN:%.c=obj/%.o) $(IMAGE:%.c=obj/%.o)
+main: $(MAIN:%.c=obj/%.o) $(IMAGE:%.c=obj/%.o) $(MAPMANAGER:%.c=obj/%.o) $(PROJECTMANAGER:%.c=obj/%.o)
 	g++ -o $@ $+
 
 clean:

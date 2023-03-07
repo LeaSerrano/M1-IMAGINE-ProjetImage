@@ -1,8 +1,8 @@
 #include "Library/ImageBase.h"
 #include "Library/PerlinNoise.hpp"
 
-#include "App/MapManager.hpp"
-#include "App/ProjectManager.hpp"
+#include "App/MapManager.h"
+#include "App/ProjectManager.h"
 
 #include <cassert>
 #include <stdio.h>
@@ -21,9 +21,16 @@ ProjectManager* projectManager;
 
 int main(int argc, char **argv)
 {
-	projectManager = new ProjectManager();
-
 	mapManager = new MapManager();
+
+	if(argc >= 2)
+	{
+		projectManager = new ProjectManager(argv[1]);
+	}
+	else
+	{
+		projectManager = new ProjectManager();
+	}
 
 	mapManager->generateHeightMap(512,512);
 

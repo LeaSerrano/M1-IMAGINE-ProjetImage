@@ -1,13 +1,14 @@
-#pragma once
+#ifndef MAPMANAGER
+#define MAPMANAGER
 
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
-#include "ProjectManager.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 
 #include <map>
 #include <string>
@@ -51,13 +52,9 @@ public:
         maps["HEIGHT"] = heightMap;
     }
 
-    void saveMap(string id)
-    {
-        if(maps.count(id) > 0)
-        {
-            maps[id]->save(ProjectManager::instance->projectPath() + "/MAPS/" + id + (maps[id]->getColor() ? ".ppm" : ".pgm"));
-        }
-    }
+    void saveMap(string id);
+
+    void loadMap(string name);
 
     MapManager()
     {
@@ -67,3 +64,5 @@ public:
 
     inline static MapManager* instance;
 };
+
+#endif
