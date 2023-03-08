@@ -21,6 +21,7 @@ MapManager* mapManager;
 ProjectManager* projectManager;
 DataManager* dataManager;
 
+
 int main(int argc, char **argv)
 {
 	srand (time(NULL));
@@ -38,11 +39,11 @@ int main(int argc, char **argv)
 		projectManager = new ProjectManager();
 	}
 
-	mapManager->getHeightMap(512, 512);
-	mapManager->saveMap("HEIGHT");
+	dataManager->requestValue("map_size");
 
-	mapManager->applyHeightMap(512, 512);
-	mapManager->saveMap("HEIGHT_SEUIL");
+	mapManager->requestMap("HEIGHT_SEA");
+
+	mapManager->saveAllMaps();
 
 	dataManager->display();
 

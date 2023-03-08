@@ -3,6 +3,7 @@
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
 #include "MapManager.h"
+#include "DataManager.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,8 +43,10 @@ public:
         return map;
     }
 
-    static ImageBase* generateHeightMap(int width, int height)
+    static ImageBase* generateHeightMap()
     {
+        int width = DataManager::instance->getValue("map_size"); int height = width;
+
         ImageBase* heightMap = new ImageBase(width,height,false);
 
         ImageBase* large = generatePerlin(width,height,0.25,1);
@@ -60,24 +63,27 @@ public:
         int width = heightMap->getWidth();
         int height = heightMap->getHeight();
 
-        float seaLevel = 0.5;
+        float sea_level = DataManager::instance->requestValue("sea_level");
+        float sea_slope = DataManager::instance->requestValue("sea_slope");
+
+        ImageBase* outImg = new ImageBase(width,height,false);
 
         for(int y = 0; y < height ; y++)
         {
             for(int x = 0; x < width; x++)
             {
-                float value = heightMap->get(x, y, 0)/255.0;
+                float value = (float)(heightMap->get(x, y, 0)) / 255.0;
 
-                if (value < seaLevel) {
-                    value = pow(value, 1.2);
-                    value *= 255;
-
-                    heightMap->set(x, y, 0, value);
+                if (value < sea_level) 
+                {
+                    value = pow(value, sea_slope);
                 }
+
+                outImg->set(x,y,0,(int)(value*255));
             }
         }
 
-        return heightMap;
+        return outImg;
     }
 
 };

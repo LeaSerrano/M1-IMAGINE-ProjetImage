@@ -33,14 +33,32 @@ public:
 
 
     void display()
-   {
+    {
       cout << ">> PROJECT DATA <<" << endl;
 
       for (map<string,double>::const_iterator it=values.begin(); it!=values.end(); it++) 
       {
           cout << it->first << "   " << it->second << endl;
       }
-   }
+    }
+
+
+  double requestValue(string name)
+  {
+    if(values.count(name) <= 0)
+    {
+      cout << ">> Enter <" << name << "> : ";
+      double v;
+      scanf("%lf",&v);
+      setValue(name,v); 
+    }
+    else
+    {
+      cout << ">> Using <" << name << "> = " << getValue(name) << endl;
+
+    }
+    return getValue(name);
+  }
 
    DataManager()
    {

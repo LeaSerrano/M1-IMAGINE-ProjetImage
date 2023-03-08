@@ -21,6 +21,7 @@ void MapManager::saveMap(string id)
 {
     if(maps.count(id) > 0)
     {
+        cout << ">> Saving <" << id << ">" << endl;
         maps[id]->save(ProjectManager::instance->projectPath() + "/MAPS/" + id + (maps[id]->getColor() ? ".ppm" : ".pgm"));
     }
 }
@@ -37,10 +38,22 @@ void MapManager::loadMap(string file)
    	maps.insert_or_assign(id,img);
 }
 
-void MapManager::getHeightMap(int width, int height) {
+ImageBase* MapManager::generateMap(string id)
+{
+    switch(hash_djb2a(id))
+    {
+        case "HEIGHT_BASE"_sh: maps[id] = HeighMap::generateHeightMap(); break;
+        case "HEIGHT_SEA"_sh: maps[id] = HeighMap::seuilHeightMap(requestMap("HEIGHT_BASE")); break;
+    }
+    return maps[id] ;
+}
+
+/*
+void MapManager::getHeightMap(int width, int height) 
+{
     maps["HEIGHT"] = HeighMap::generateHeightMap(width, height);
 }
 
 void MapManager::applyHeightMap(int width, int height) {
     maps["HEIGHT_SEUIL"] = HeighMap::seuilHeightMap(maps["HEIGHT"]); 
-}
+}*/

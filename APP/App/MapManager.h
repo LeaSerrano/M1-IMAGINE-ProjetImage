@@ -12,9 +12,25 @@
 
 #include <map>
 #include <string>
+#include <string_view>
 
 using namespace std;
 using namespace siv;
+
+
+inline constexpr auto hash_djb2a(const std::string_view sv) {
+    unsigned long hash{ 5381 };
+    for (unsigned char c : sv) {
+        hash = ((hash << 5) + hash) ^ c;
+    }
+    return hash;
+}
+
+inline constexpr auto operator"" _sh(const char *str, size_t len) 
+{
+    return hash_djb2a(std::string_view{ str, len });
+}
+
 
 class MapManager
 {
@@ -24,39 +40,34 @@ private:
 
 public:
 
-    static uint32_t seed() {
-        return (int)((rand() / (float)RAND_MAX) * pow(2,32)); 
-    }
-
-    void generateHeightMap(int width, int height)
-    {
-        ImageBase* heightMap = new ImageBase(width,height,false);
-
-        double frequency = 16.0;
-        clamp(frequency, 0.1, 64.0);
-
-        int32_t octaves = 1;
-        octaves = clamp(octaves, 1, 16);
-
-        const PerlinNoise perlin{seed()};
-
-        double fx = frequency / width; double fy = frequency / height;
-
-        for(int y = 0; y < height ; y++)
-        {
-            for(int x = 0; x < width; x++)
-            {
-                double v = perlin.octave2D_01(x*fx,y*fy,octaves);
-                heightMap->set(x,y,0,v*255);
-            }
-        }
-
-        maps["HEIGHT"] = heightMap;
-    }
+    static uint32_t seed() { return (int)((rand() / (float)RAND_MAX) * pow(2,32)); }
 
     void saveMap(string id);
+    void saveAllMaps()
+    {
+        for (map<string,ImageBase*>::const_iterator it=maps.begin(); it!=maps.end(); it++) 
+        {
+            saveMap(it->first);
+        }
+    }
 
     void loadMap(string name);
+
+    ImageBase* requestMap(string id)
+    {
+        if(maps.count(id) > 0)
+        {
+            cout << ">> Using loaded map <" << id << ">" << endl;
+            return maps[id];
+        }
+        else
+        {
+            cout << ">> Generating map <" << id << ">" << endl;
+            return generateMap(id);
+        }
+    }
+
+    ImageBase* generateMap(string id);
 
     void getHeightMap(int width, int height);
 
