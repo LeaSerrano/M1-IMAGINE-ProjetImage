@@ -1,5 +1,5 @@
 map_scale:100
-map_size:1024
+map_size:4096
 sea_level:0.5
 sea_slope:2
 shore_width:0.1
