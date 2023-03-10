@@ -16,6 +16,7 @@ class DataManager
 public:
 
     map<string,double> values;
+    map<string,string> tooltips;
 
     double getValue(string id)
     {
@@ -47,7 +48,9 @@ public:
   {
     if(values.count(name) <= 0)
     {
-      cout << ">> Enter <" << name << "> : ";
+      cout << ">> Enter <" << name << "> ";
+      if(tooltips.count(name) > 0){cout << "(" << tooltips[name] << ") ";}
+      cout << " : ";
       double v;
       scanf("%lf",&v);
       setValue(name,v); 
@@ -60,9 +63,19 @@ public:
     return getValue(name);
   }
 
+  void setupTooltips()
+  {
+      tooltips = 
+      {
+          {"map_size","Size of the maps in pixels"},
+          {"map_scale","Size of the maps in kilometers"}
+      };
+  }
+
    DataManager()
    {
         instance = this;
+        setupTooltips();
    }
 
    inline static DataManager* instance;

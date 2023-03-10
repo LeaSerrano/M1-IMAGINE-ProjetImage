@@ -4,6 +4,7 @@
 #include "App/MapManager.h"
 #include "App/ProjectManager.h"
 #include "App/DataManager.hpp"
+#include "App/HeightMap.hpp"
 
 #include <cassert>
 #include <stdio.h>
@@ -46,6 +47,25 @@ int main(int argc, char **argv)
 	mapManager->saveAllMaps();
 
 	dataManager->display();
+
+	/*
+	double sea_level = 0.5; 
+	double sea_slope = 2;
+	double shore_width = 0.1;
+	double* data = new double[256];
+	for(int i = 0; i < 256; i++)
+	{
+		double v = i / 256.0;
+		if(v < sea_level)
+		{
+			v = HeightMap::seaCurve(v,sea_level,sea_slope,shore_width);
+		}
+		data[i] = v;
+
+	}
+
+	ofstream flux("data.dat");
+	for(int i = 0; i < 256;i++)	{	flux << i << " " << data[i] << std::endl;}*/
 
 	projectManager->saveData();
 
