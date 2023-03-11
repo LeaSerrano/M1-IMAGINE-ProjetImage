@@ -7,6 +7,7 @@
 
 #include <map>
 #include <string>
+#include <float.h>
 
 using namespace std;
 
@@ -43,23 +44,34 @@ public:
       }
     }
 
-
   double requestValue(string name)
   {
-    if(values.count(name) <= 0)
+      return requestValue(name,DBL_MAX);
+  }
+  double requestValue(string name, double value)
+  {
+    if(value != DBL_MAX) { cout << ">> Suggested value for <" << name << "> : " << value << endl; }
+
+    if(values.count(name) > 0)
     {
-      cout << ">> Enter <" << name << "> ";
-      if(tooltips.count(name) > 0){cout << "(" << tooltips[name] << ") ";}
-      cout << " : ";
-      double v;
-      scanf("%lf",&v);
-      setValue(name,v); 
+      cout << ">> Found <" << name << "> = " << getValue(name) << ". 'ENTER' to use it, or enter your own value : ";
+      string line; getline(std::cin, line);
+      if(line != "")
+      {
+        double v = stod(line);
+        setValue(name,v);
+      }
     }
     else
     {
-      cout << ">> Using <" << name << "> = " << getValue(name) << endl;
+      cout << ">> Enter <" << name << "> ";
 
+      if(tooltips.count(name) > 0){cout << "(" << tooltips[name] << ") ";}
+      cout << " : ";
+      double v; scanf("%lf",&v);
+      setValue(name,v);
     }
+
     return getValue(name);
   }
 

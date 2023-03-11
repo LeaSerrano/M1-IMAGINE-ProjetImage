@@ -42,6 +42,18 @@ public:
 
     static uint32_t seed() { return (int)((rand() / (float)RAND_MAX) * pow(2,32)); }
 
+    ImageBase* get(string id)
+    {
+        if(maps.count(id) > 0)
+        {
+            return maps[id];
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
     void saveMap(string id);
     void saveAllMaps()
     {

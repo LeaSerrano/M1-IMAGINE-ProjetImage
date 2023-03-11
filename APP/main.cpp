@@ -40,9 +40,9 @@ int main(int argc, char **argv)
 		projectManager = new ProjectManager();
 	}
 
-	dataManager->requestValue("map_size");
-
 	mapManager->requestMap("HEIGHT_SEA");
+
+	//mapManager->get("HEIGHT_BASE")->saveHistogram(mapManager->get("HEIGHT_BASE")->histogram(0),"histo.dat");
 
 	mapManager->saveAllMaps();
 
