@@ -29,6 +29,23 @@ public:
 
         ImageBase* large = Noise::generatePerlin(width,height,scale,1);
 
+        int max = 0; int min = 0;
+        for(int i = 0; i < large->getSize();i++)
+        {
+            if(large->get(i,0) > max) {max = large->get(i,0);}
+            if(large->get(i,0) < min) {min = large->get(i,0);}
+        }
+
+        for(int i = 0; i < large->getSize();i++)
+        {
+            float v = large->get(i,0);
+            v -= min;
+            v /= (float)(max-min);
+            v *= 255;
+            large->set(i,0,v);
+
+        }
+
         return large;
     }
 
