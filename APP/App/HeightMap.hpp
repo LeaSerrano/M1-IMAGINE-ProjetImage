@@ -115,7 +115,7 @@ public:
         // some other parameters
         //  i.e : beach_level , plain_level , plateau_level , pikes_level
 
-        ImageBase* outImg = new ImageBase(width,height,fal
+        ImageBase* outImg = new ImageBase(width,height,false);
 
         for(int y = 0; y < height ; y++)
         {
