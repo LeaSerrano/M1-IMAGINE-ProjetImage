@@ -16,68 +16,98 @@ class DataManager
 
 public:
 
-    map<string,double> values;
-    map<string,string> tooltips;
+   map<string,double> values;
+   map<string,string> tooltips;
 
-    double getValue(string id)
-    {
-      if(values.count(id) > 0)
-      {
-        return values[id];
-      }
-      return 0;
-    }
+   bool valueExists(string name){return values.count(name) > 0;}
 
-    void setValue(string id, double v)
-    {
-      values[id] = v;
-    }
+   double getValue(string id)
+   {
+     if(values.count(id) > 0)
+     {
+       return values[id];
+     }
+     return 0;
+   }
+
+   void setValue(string id, double v)
+   {
+     values[id] = v;
+   }
 
 
-    void display()
-    {
+   void display()
+   {
       cout << ">> PROJECT DATA <<" << endl;
 
-      for (map<string,double>::const_iterator it=values.begin(); it!=values.end(); it++) 
+      for (map<string,double>::const_iterator it=values.begin(); it!=values.end(); it++)
       {
           cout << it->first << "   " << it->second << endl;
       }
-    }
+   }
 
-  double requestValue(string name)
-  {
-      return requestValue(name,DBL_MAX);
-  }
-  double requestValue(string name, double value)
-  {
-    if(value != DBL_MAX) { cout << ">> Suggested value for <" << name << "> : " << value << endl; }
-
-    if(values.count(name) > 0)
-    {
-      cout << ">> Found <" << name << "> = " << getValue(name) << ". 'ENTER' to use it, or enter your own value : ";
-      string line; getline(std::cin, line);
-      if(line != "")
+   //Checks if the value exists ; if it doesnt, starts a request
+   void setupValue(string name)
+   {
+      if(valueExists(name))
       {
-        double v = stod(line);
-        setValue(name,v);
+         cout << ">> Using <" << name << "> = " << getValue(name) << endl;
       }
-    }
-    else
-    {
-      cout << ">> Enter <" << name << "> ";
+      else
+      {
+         requestValue(name);
+      }
+   }
 
-      if(tooltips.count(name) > 0){cout << "(" << tooltips[name] << ") ";}
-      cout << " : ";
-      double v; scanf("%lf",&v);
-      setValue(name,v);
-    }
+   double requestValue(string name)
+   {
+      return requestValue(name,DBL_MAX);
+   }
+   double requestValue(string name, double value)
+   {
+      return requestValue(name,value,false);
+   }
+   double requestValue(string name, bool ask)
+   {
+      return requestValue(name,DBL_MAX,ask);
+   }
+   double requestValue(string name, double value,bool ask)
+   {
+      if(value != DBL_MAX) { cout << ">> Suggested value for <" << name << "> : " << value << endl; }
 
-    return getValue(name);
-  }
+      if(values.count(name) > 0)
+      {
+         if(ask)
+         {
+            cout << ">> Found <" << name << "> = " << getValue(name) << ". 'ENTER' to use it, or enter your own value : ";
+            string line; getline(std::cin, line);
+            if(line != "")
+            {
+               double v = stod(line);
+               setValue(name,v);
+            }
+         }
+         else
+         {
+            cout << ">> Using <" << name << "> = " << getValue(name) << endl;
+         }
+      }
+      else
+      {
+         cout << ">> Enter <" << name << "> ";
+         if(tooltips.count(name) > 0){cout << "(" << tooltips[name] << ") ";}
+         cout << " : ";
+
+         double v; scanf("%lf",&v);
+         setValue(name,v);
+      }
+
+      return getValue(name);
+   }
 
   void setupTooltips()
   {
-      tooltips = 
+      tooltips =
       {
           {"map_size","Size of the maps in pixels"},
           {"map_scale","Size of the maps in kilometers"}

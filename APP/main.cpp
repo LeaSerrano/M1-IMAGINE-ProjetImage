@@ -22,6 +22,21 @@ MapManager* mapManager;
 ProjectManager* projectManager;
 DataManager* dataManager;
 
+void makeMap(string id)
+{
+	do
+	{
+		mapManager->requestMap(id); mapManager->saveMap(id);
+
+		cout << ">> Satisfied with this map ? (y/n) : ";
+		string line; getline(std::cin, line);
+		if(line == "y")	{	break;	}
+		else
+		{
+			mapManager->deleteMap(id);
+		}
+	}while(true);
+}
 
 int main(int argc, char **argv)
 {
@@ -40,33 +55,23 @@ int main(int argc, char **argv)
 		projectManager = new ProjectManager();
 	}
 
-	mapManager->requestMap("SEA_BINARY");
-	mapManager->requestMap("HEIGHT_SEA");
+	cout << endl << "--   --  Welcome to Map Maker  --   --" << endl << endl;
 
-	//mapManager->get("HEIGHT_BASE")->saveHistogram(mapManager->get("HEIGHT_BASE")->histogram(0),"histo.dat");
+	cout << "--   Lets start with some main parameters : " << endl;
+
+	dataManager->setupValue("map_size");
+	dataManager->setupValue("map_scale");
+
+	cout << endl << "--  Lets start by generating the base height map :" << endl;
+	makeMap("HEIGHT_BASE");
+
+	cout << endl << "--  Choose sea-level :" << endl;
+	makeMap("SEA_BINARY");
+
+	cout << endl << "--  Lets refine the height map with sea-parameters :" << endl;
+	makeMap("HEIGHT_SEA");
 
 	mapManager->saveAllMaps();
-
-	dataManager->display();
-
-	/*
-	double sea_level = 0.5; 
-	double sea_slope = 2;
-	double shore_width = 0.1;
-	double* data = new double[256];
-	for(int i = 0; i < 256; i++)
-	{
-		double v = i / 256.0;
-		if(v < sea_level)
-		{
-			v = HeightMap::seaCurve(v,sea_level,sea_slope,shore_width);
-		}
-		data[i] = v;
-
-	}
-
-	ofstream flux("data.dat");
-	for(int i = 0; i < 256;i++)	{	flux << i << " " << data[i] << std::endl;}*/
 
 	projectManager->saveData();
 

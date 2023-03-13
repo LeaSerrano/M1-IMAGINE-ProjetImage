@@ -4,6 +4,7 @@
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
 
+#include <cstdio>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -40,7 +41,7 @@ private:
 
 public:
 
-    static uint32_t seed() { return (int)((rand() / (float)RAND_MAX) * pow(2,32)); }
+    static uint32_t seed() { return (uint32_t)((rand() / (float)RAND_MAX) * pow(2,32)); }
 
     ImageBase* get(string id)
     {
@@ -64,6 +65,8 @@ public:
     }
 
     void loadMap(string name);
+
+    void deleteMap(string name);
 
     ImageBase* requestMap(string id)
     {

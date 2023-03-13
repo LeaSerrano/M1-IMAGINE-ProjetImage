@@ -93,14 +93,14 @@ public:
         return value * sea_level;
     }
 
-    static ImageBase* seaMap(ImageBase* heightMap) {
+    static ImageBase* seaMap(ImageBase* heightMap)
+    {
         int width = heightMap->getWidth();
         int height = heightMap->getHeight();
 
-        float sea_level = quantile(heightMap,0.4) / 255.0;
-        sea_level = DataManager::instance->requestValue("sea_level",sea_level);
-        float sea_slope = DataManager::instance->requestValue("sea_slope");
-        float shore_width = DataManager::instance->requestValue("shore_width");
+        float sea_level = DataManager::instance->requestValue("sea_level");
+        float sea_slope = DataManager::instance->requestValue("sea_slope",true);
+        float shore_width = DataManager::instance->requestValue("shore_width",true);
 
         ImageBase* outImg = new ImageBase(width,height,false);
 
@@ -126,7 +126,8 @@ public:
     {
         ImageBase* outImg = new ImageBase(heightMap->getWidth(),heightMap->getHeight(),false);
 
-        float sea_level = DataManager::instance->requestValue("sea_level");
+        float sea_level = quantile(heightMap,0.5) / 255.0;
+        sea_level = DataManager::instance->requestValue("sea_level",sea_level,true);
         for(int i = 0; i < heightMap->getSize();i++)
         {
             if(heightMap->get(i,0) / 255.0 < sea_level)

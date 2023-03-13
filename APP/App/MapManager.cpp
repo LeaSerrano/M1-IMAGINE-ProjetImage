@@ -38,10 +38,22 @@ void MapManager::loadMap(string file)
    	maps.insert_or_assign(id,img);
 }
 
+void MapManager::deleteMap(string name)
+{
+    if(maps.count(name) > 0)
+    {
+        maps.erase(name);
+        remove((ProjectManager::instance->projectPath() + "/MAPS/" + name + ".pgm").c_str());
+        remove((ProjectManager::instance->projectPath() + "/MAPS/" + name + ".ppm").c_str());
+    }
+}
+
+
 ImageBase* MapManager::generateMap(string id)
 {
     switch(hash_djb2a(id))
     {
+        default: cout << ">> Requested map <" << id << "> doesnt exist ! " << endl; break;
         case "HEIGHT_BASE"_sh: maps[id] = HeightMap::baseMap(); break;
         case "HEIGHT_SEA"_sh: maps[id] = HeightMap::seaMap(requestMap("HEIGHT_BASE")); break;
         case "SEA_BINARY"_sh: maps[id] = HeightMap::seaBinaryMap(requestMap("HEIGHT_BASE")); break;
