@@ -97,7 +97,7 @@ public:
         int width = heightMap->getWidth();
         int height = heightMap->getHeight();
 
-        float sea_level = quantile(heightMap,0.7) / 255.0;
+        float sea_level = quantile(heightMap,0.4) / 255.0;
         sea_level = DataManager::instance->requestValue("sea_level",sea_level);
         float sea_slope = DataManager::instance->requestValue("sea_slope");
         float shore_width = DataManager::instance->requestValue("shore_width");
@@ -116,6 +116,26 @@ public:
                 }
 
                 outImg->set(x,y,0,(int)(value*255));
+            }
+        }
+
+        return outImg;
+    }
+
+    static ImageBase* seaBinaryMap(ImageBase* heightMap)
+    {
+        ImageBase* outImg = new ImageBase(heightMap->getWidth(),heightMap->getHeight(),false);
+
+        float sea_level = DataManager::instance->requestValue("sea_level");
+        for(int i = 0; i < heightMap->getSize();i++)
+        {
+            if(heightMap->get(i,0) / 255.0 < sea_level)
+            {
+                outImg->set(i,0,0);
+            }
+            else
+            {
+                outImg->set(i,0,255);
             }
         }
 

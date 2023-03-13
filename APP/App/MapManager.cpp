@@ -44,6 +44,7 @@ ImageBase* MapManager::generateMap(string id)
     {
         case "HEIGHT_BASE"_sh: maps[id] = HeightMap::baseMap(); break;
         case "HEIGHT_SEA"_sh: maps[id] = HeightMap::seaMap(requestMap("HEIGHT_BASE")); break;
+        case "SEA_BINARY"_sh: maps[id] = HeightMap::seaBinaryMap(requestMap("HEIGHT_BASE")); break;
     }
     return maps[id] ;
 }
