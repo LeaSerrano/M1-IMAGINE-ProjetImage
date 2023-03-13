@@ -2,4 +2,4 @@ map_scale:200
 map_size:2048
 sea_level:0.6
 sea_slope:2
-shore_width:0.02
+shore_level:0.02

@@ -71,6 +71,12 @@ int main(int argc, char **argv)
 	cout << endl << "--  Lets refine the height map with sea-parameters :" << endl;
 	makeMap("HEIGHT_SEA");
 
+	cout << endl << "--  Lets refine the height map with land-parameters :" << endl;
+	makeMap("HEIGHT_LAND");
+
+	cout << endl << "--  Generate the gradient map :" << endl;
+	makeMap("HEIGHT_GRADIENT");
+
 	mapManager->saveAllMaps();
 
 	projectManager->saveData();
