@@ -2,6 +2,7 @@
 
 #include "../Library/ImageBase.h"
 #include "Noise.hpp"
+#include "Utilities.hpp"
 #include "MapManager.h"
 #include "DataManager.hpp"
 
@@ -23,44 +24,6 @@ class HeightMap
 
 public:
 
-    static ImageBase* remap(ImageBase* img, int min, int max)
-    {
-        ImageBase* map = new ImageBase(img->getWidth(),img->getHeight(),false);
-
-        int imax = 0; int imin = 0;
-        for(int i = 0; i < img->getSize();i++)
-        {
-            if(img->get(i,0) > imax) {imax = img->get(i,0);}
-            if(img->get(i,0) < imin) {imin = img->get(i,0);}
-        }
-
-        for(int i = 0; i < img->getSize();i++)
-        {
-            float v = img->get(i,0);
-            v -= imin;
-            v /= (float)(imax-imin);
-
-            v *= (max-min);
-            v += min;
-            map->set(i,0,v);
-        }
-
-        return map;
-    }
-
-    static int quantile(ImageBase* img, double ratio)
-    {
-        vector<int> values;
-        for(int i = 0; i < img->getSize();i++)
-        {
-            values.push_back(img->get(i,0));
-        }
-
-        sort(values.begin(), values.end());
-
-        return values.at((values.size()-1) * ratio);
-    }
-
     static ImageBase* baseMap()
     {
         int width = DataManager::instance->requestValue("map_size"); int height = width;
@@ -68,7 +31,7 @@ public:
 
         ImageBase* large = Noise::generatePerlin(width,height,scale,1);
 
-        large = remap(large,0,255);
+        large = Utilities::remap(large,0,255);
 
         return large;
     }
@@ -126,7 +89,7 @@ public:
     {
         ImageBase* outImg = new ImageBase(heightMap->getWidth(),heightMap->getHeight(),false);
 
-        float sea_level = quantile(heightMap,0.5) / 255.0;
+        float sea_level = Utilities::quantile(heightMap,0.5) / 255.0;
         sea_level = DataManager::instance->requestValue("sea_level",sea_level,true);
         for(int i = 0; i < heightMap->getSize();i++)
         {
