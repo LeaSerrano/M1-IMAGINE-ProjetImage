@@ -89,7 +89,7 @@ public:
     {
         ImageBase* outImg = new ImageBase(heightMap->getWidth(),heightMap->getHeight(),false);
 
-        float sea_level = Utilities::quantile(heightMap,0.5) / 255.0;
+        float sea_level = Utilities::quantile(heightMap,suggestedSeaRatio) / 255.0;
         sea_level = DataManager::instance->requestValue("sea_level",sea_level,true);
         for(int i = 0; i < heightMap->getSize();i++)
         {
@@ -106,14 +106,30 @@ public:
         return outImg;
     }
 
+    static double landCurve(double value)
+    {
+
+        return value;
+    }
+
     static ImageBase* applyLand(ImageBase* heightMap)
     {
         int width = heightMap->getWidth();
         int height = heightMap->getHeight();
 
         float sea_level = DataManager::instance->requestValue("sea_level");
-        // some other parameters
-        //  i.e : beach_level , plain_level , plateau_level , pikes_level
+
+        float beach_level = Utilities::quantile(heightMap,suggestedBeachRatio) / 255.0;
+        beach_level = DataManager::instance->requestValue("beach_level",beach_level,true);
+
+        float plain_level = Utilities::quantile(heightMap,suggestedPlainRatio) / 255.0;
+        plain_level = DataManager::instance->requestValue("plain_level",plain_level,true);
+
+        float hills_level = Utilities::quantile(heightMap,suggestedHillsRatio) / 255.0;
+        hills_level = DataManager::instance->requestValue("hills_level",hills_level,true);
+
+        float plateau_level = Utilities::quantile(heightMap,suggestedPlateauRatio) / 255.0;
+        plateau_level = DataManager::instance->requestValue("plateau_level",plateau_level,true);
 
         ImageBase* outImg = new ImageBase(width,height,false);
 
@@ -158,4 +174,9 @@ public:
         return outImg;
     }
 
+    const double suggestedSeaRatio = 0.5;
+    const double suggestedBeachRatio = 0.55;
+    const double suggestedPlainRatio = 0.65;
+    const double suggestedHillsRatio = 0.75;
+    const double suggestedPlateauRatio = 0.85;
 };
