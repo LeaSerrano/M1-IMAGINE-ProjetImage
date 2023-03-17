@@ -12,6 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <math.h>
 
 #include <string>
 
@@ -30,12 +31,26 @@ void makeMap(string id)
 
 		cout << ">> Satisfied with this map ? (y/n) : ";
 		string line; getline(std::cin, line);
-		if(line == "y")	{	break;	}
+		if(line != "n")	{	break;	}
 		else
 		{
 			mapManager->deleteMap(id);
 		}
 	}while(true);
+}
+
+
+void tests()
+{
+	/*
+	int* histo = new int[256];
+	for(int i = 0; i < 256; i++)
+	{
+		histo[i] = (int)(landCurve(i/255.0,0.5,0.1,0.45,0.65,0.9)*255);
+	}
+
+	ofstream flux("data.dat");
+	for(int i = 0; i < 256;i++)	{	flux << i << " " << histo[i] << std::endl;}*/
 }
 
 int main(int argc, char **argv)
@@ -54,6 +69,8 @@ int main(int argc, char **argv)
 	{
 		projectManager = new ProjectManager();
 	}
+
+	tests();
 
 	cout << endl << "--   --  Welcome to Map Maker  --   --" << endl << endl;
 
