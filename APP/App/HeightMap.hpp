@@ -3,7 +3,6 @@
 #include "../Library/ImageBase.h"
 #include "Noise.hpp"
 #include "Utilities.hpp"
-#include "MapManager.h"
 #include "DataManager.hpp"
 
 #include <stdio.h>

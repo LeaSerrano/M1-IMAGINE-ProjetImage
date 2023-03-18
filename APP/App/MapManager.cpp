@@ -10,6 +10,7 @@
 #include "ProjectManager.h"
 #include "MapManager.h"
 #include "HeightMap.hpp"
+#include "ReliefMap.hpp"
 
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
@@ -62,6 +63,8 @@ ImageBase* MapManager::generateMap(string id)
         case "HEIGHT_LAND"_sh: maps[id] = HeightMap::applyLand(requestMap("HEIGHT_SEA")); break;
 
         case "HEIGHT_GRADIENT"_sh: maps[id] = HeightMap::gradientMap(requestMap("HEIGHT_LAND")); break;
+
+        case "RELIEF"_sh: maps[id] = ReliefMap::reliefMap(requestMap("HEIGHT_GRADIENT"),requestMap("HEIGHT_BASE")); break;
 
     }
     return maps[id] ;

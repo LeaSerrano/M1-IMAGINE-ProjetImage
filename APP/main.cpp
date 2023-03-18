@@ -94,6 +94,9 @@ int main(int argc, char **argv)
 	cout << endl << "--  Generate the gradient map :" << endl;
 	makeMap("HEIGHT_GRADIENT");
 
+	cout << endl << "--  Generate the reliefs map :" << endl;
+	makeMap("RELIEF");
+
 	mapManager->saveAllMaps();
 
 	projectManager->saveData();
