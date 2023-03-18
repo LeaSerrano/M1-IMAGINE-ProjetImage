@@ -233,15 +233,157 @@ public:
         //PPM image : gradient will be stored as a vector + norm using RGB (dx , dy , norm)
         ImageBase* outImg = new ImageBase(width,height,true);
 
+        float dx, dy, norm;
+        float valueUp1, valueUp2, valueUp3, valueRight1, valueRight2, valueRight3, valueDiag1, valueDiag2, valueDiag3, value;
+
+
         for(int y = 0; y < height ; y++)
         {
             for(int x = 0; x < width; x++)
             {
-                float value = (float)(heightMap->get(x, y, 0)) / 255.0;
+                if (x < width-3 && y < height-3) {
 
-                //calculate the gradient direction
+                value = (float)(heightMap->get(x, y, 0));
 
-                outImg->set(x,y,0,(int)(value*255));
+                valueRight1 = (float)(heightMap->get(x+1, y, 0));
+                valueRight2 = (float)(heightMap->get(x+2, y, 0));
+                valueRight3 = (float)(heightMap->get(x+3, y, 0));
+
+                valueUp1 = (float)(heightMap->get(x, y+1, 0));
+                valueUp2 = (float)(heightMap->get(x, y+2, 0));
+                valueUp3 = (float)(heightMap->get(x, y+3, 0));
+
+                valueDiag1 = (float)(heightMap->get(x+1, y+1, 0));
+                valueDiag2 = (float)(heightMap->get(x+2, y+2, 0));
+                valueDiag3 = (float)(heightMap->get(x+3, y+3, 0));
+
+
+                float dx1 = x - (x+1);
+                float dy1 = y - (y+1);
+                float dxDiag1 = x - (x+1);
+                float dyDiag1 = y - (y+1);
+
+                dx1 *= valueRight1 - value;
+                dy1 *= valueUp1 - value;
+                dxDiag1 *= valueDiag1 - value;
+                dyDiag1 *= valueDiag1 - value;
+
+
+                float dx2 = x - (x+2);
+                float dy2 = y - (y+2);
+                float dxDiag2 = x - (x+2);
+                float dyDiag2 = y - (y+2);
+
+                dx2 *= valueRight2 - value;
+                dy2 *= valueUp2 - value;
+                dxDiag2 *= valueDiag2 - value;
+                dyDiag2 *= valueDiag2 - value;
+
+
+                float dx3 = x - (x+3);
+                float dy3 = y - (y+3);
+                float dxDiag3 = x - (x+3);
+                float dyDiag3 = y - (y+3);
+
+                dx3 *= valueRight3 - value;
+                dy3 *= valueUp3 - value;
+                dxDiag3 *= valueDiag3 - value;
+                dyDiag3 *= valueDiag3 - value;
+
+                
+                dx = (dx1 + dx2 + dx3 + dxDiag1 + dxDiag2 + dxDiag3)/6;
+                dy = (dy1 + dy2 + dy3 + dyDiag1 + dyDiag2 + dyDiag3)/6;
+                norm = sqrt(pow(dx, 2) + pow(dy, 2));
+
+                dx = 128 + (dx * 128);
+                dy = 128 + (dy * 128);
+                norm = 128 + (norm * 128);
+
+                if (dx < 0) {
+                    dx = 0;
+                }
+                else if (dx > 255) {
+                    dx = 255;
+                }
+                if (dy < 0) {
+                    dy = 0;
+                }
+                else if (dy > 255) {
+                    dy = 255;
+                }
+                if (norm < 0) {
+                    norm = 0;
+                }
+                else if (norm > 255) {
+                    norm = 255;
+                }
+
+                outImg->set(x,y,0,(int)(dx));
+                outImg->set(x,y,1,(int)(dy));
+                outImg->set(x,y,2,(int)(norm));
+
+                }
+            }
+        }
+
+        //Image blurring
+        for (int elt = 0; elt < 3; elt++) {
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+        
+                    outImg->set(x,y,0,(int)((float)(outImg->get(x-2, y-2, 0)) + (float)(outImg->get(x-1, y-2, 0)) + (float)(outImg->get(x, y-2, 0)) + (float)(outImg->get(x+1, y-2, 0)) + (float)(outImg->get(x+2, y-2, 0)) + (float)(outImg->get(x-2, y-1, 0)) + (float)(outImg->get(x-1, y-1, 0)) + (float)(outImg->get(x, y-1, 0)) + (float)(outImg->get(x+1, y-1, 0)) + (float)(outImg->get(x+2, y-1, 0)) + (float)(outImg->get(x-2, y, 0)) + (float)(outImg->get(x-1, y, 0)) + (float)(outImg->get(x, y, 0)) + (float)(outImg->get(x+1, y, 0)) + (float)(outImg->get(x+2, y, 0)) + (float)(outImg->get(x-2, y+1, 0)) + (float)(outImg->get(x-1, y+1, 0)) + (float)(outImg->get(x, y+1, 0)) + (float)(outImg->get(x+1, y+1, 0)) + (float)(outImg->get(x-2, y+2, 0)) + (float)(outImg->get(x-1, y+2, 0)) + (float)(outImg->get(x, y+2, 0)) + (float)(outImg->get(x+1, y+2, 0)) + (float)(outImg->get(x+2, y+2, 0)))/25);
+                    outImg->set(x,y,1,(int)((float)(outImg->get(x-2, y-2, 1)) + (float)(outImg->get(x-1, y-2, 1)) + (float)(outImg->get(x, y-2, 1)) + (float)(outImg->get(x+1, y-2, 1)) + (float)(outImg->get(x+2, y-2, 1)) + (float)(outImg->get(x-2, y-1, 1)) + (float)(outImg->get(x-1, y-1, 1)) + (float)(outImg->get(x, y-1, 1)) + (float)(outImg->get(x+1, y-1, 1)) + (float)(outImg->get(x+2, y-1, 1)) + (float)(outImg->get(x-2, y, 1)) + (float)(outImg->get(x-1, y, 1)) + (float)(outImg->get(x, y, 1)) + (float)(outImg->get(x+1, y, 1)) + (float)(outImg->get(x+2, y, 1)) + (float)(outImg->get(x-2, y+1, 1)) + (float)(outImg->get(x-1, y+1, 1)) + (float)(outImg->get(x, y+1, 1)) + (float)(outImg->get(x+1, y+1, 1)) + (float)(outImg->get(x-2, y+2, 1)) + (float)(outImg->get(x-1, y+2, 1)) + (float)(outImg->get(x, y+2, 1)) + (float)(outImg->get(x+1, y+2, 1)) + (float)(outImg->get(x+2, y+2, 1)))/25);
+                    outImg->set(x,y,2,(int)((float)(outImg->get(x-2, y-2, 2)) + (float)(outImg->get(x-1, y-2, 2)) + (float)(outImg->get(x, y-2, 2)) + (float)(outImg->get(x+1, y-2, 2)) + (float)(outImg->get(x+2, y-2, 2)) + (float)(outImg->get(x-2, y-1, 2)) + (float)(outImg->get(x-1, y-1, 2)) + (float)(outImg->get(x, y-1, 2)) + (float)(outImg->get(x+1, y-1, 2)) + (float)(outImg->get(x+2, y-1, 2)) + (float)(outImg->get(x-2, y, 2)) + (float)(outImg->get(x-1, y, 2)) + (float)(outImg->get(x, y, 2)) + (float)(outImg->get(x+1, y, 2)) + (float)(outImg->get(x+2, y, 2)) + (float)(outImg->get(x-2, y+1, 2)) + (float)(outImg->get(x-1, y+1, 2)) + (float)(outImg->get(x, y+1, 2)) + (float)(outImg->get(x+1, y+1, 2)) + (float)(outImg->get(x-2, y+2, 2)) + (float)(outImg->get(x-1, y+2, 2)) + (float)(outImg->get(x, y+2, 2)) + (float)(outImg->get(x+1, y+2, 2)) + (float)(outImg->get(x+2, y+2, 2)))/25);
+                } 
+            } 
+        }
+
+        return outImg;
+    }
+
+    static ImageBase* getImageR(ImageBase* image)
+    {
+        int width = image->getWidth();
+        int height = image->getHeight();
+
+        ImageBase* outImg = new ImageBase(width,height,false);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                outImg->set(x,y,0, (image->get(x, y, 0)));
+            }
+        }
+
+        return outImg;
+    }
+
+    static ImageBase* getImageG(ImageBase* image)
+    {
+        int width = image->getWidth();
+        int height = image->getHeight();
+
+        ImageBase* outImg = new ImageBase(width,height,false);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                outImg->set(x,y,0, (image->get(x, y, 1)));
+            }
+        }
+
+        return outImg;
+    }
+
+    static ImageBase* getImageB(ImageBase* image)
+    {
+        int width = image->getWidth();
+        int height = image->getHeight();
+
+        ImageBase* outImg = new ImageBase(width,height,false);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                outImg->set(x,y,0, (image->get(x, y, 2)));
             }
         }
 
