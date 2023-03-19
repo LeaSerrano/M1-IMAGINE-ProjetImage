@@ -24,30 +24,33 @@ class ReliefMap
 
 public:
 
-    inline static Color sea_color;     //Main sea
-    inline static Color shore_color;   //Not deep sea
-    inline static Color beach_color;   //Beach level, small gradient
-    inline static Color plain_color;   //Plain and hills level, small gradient
-    inline static Color hills_color;   //Plain and Hills level, medium gradient
-    inline static Color cliff_color;   //Above sea level, high gradient
-    inline static Color plateau_color; //Plateau and peak level, small gradient
-    inline static Color peaks_color;   //Plateau and peak level, high gradient
+    inline static Color sea_color = Color(30,30,255);;     //Main sea
+    inline static Color shore_color = Color(100,100,255);   //Not deep sea
+    inline static Color beach_color = Color(200,200,50);;   //Beach level, small gradient
+    inline static Color plain_color = Color(100,255,100);;   //Plain and hills level, small gradient
+    inline static Color hills_color = Color(80,200,80);;   //Plain and Hills level, medium gradient
+    inline static Color cliff_color = Color(50,50,50);;   //Above sea level, high gradient
+    inline static Color plateau_color = Color(100,100,80);; //Plateau and peak level, small gradient
+    inline static Color peaks_color = Color(200,200,200);;   //Plateau and peak level, high gradient
 
-    static void setup()
+    inline static double hills_gradient = 0.75;
+    inline static double cliff_gradient = 0.85;
+
+    /*static void setup()
     {
         sea_color = Color(30,30,255);
         shore_color = Color(100,100,255);
         beach_color = Color(200,200,50);
         plain_color = Color(100,255,100);
-        hills_color = Color(150,100,80);
+        hills_color = Color(80,200,80);
         cliff_color = Color(50,50,50);
         plateau_color = Color(100,100,80);
         peaks_color = Color(200,200,200);
-    }
+    }*/
 
     static ImageBase* reliefMap(ImageBase* gradientMap, ImageBase* heightMap)
     {
-        setup();
+        //setup();
 
         ImageBase* map = new ImageBase(gradientMap->getWidth(),gradientMap->getHeight(),true);
 
@@ -64,6 +67,7 @@ public:
             for(int y = 0; y < gradientMap->getHeight(); y++)
             {
                 float altitude = (float)(heightMap->get(x, y, 0)) / 255.0;
+                float gradient = (float)(gradientMap->get(x,y,2)) / 255.0;
 
                 if(altitude < sea_level)
                 {
@@ -84,14 +88,25 @@ public:
                     if(altitude < beach_level)
                     {
                         color = beach_color;
-                    }
-                    else if(altitude < plain_level)
+                    }/*
+                    else if(altitude < plain_level )
                     {
                         color = plain_color;
-                    }
-                    else if(altitude < hills_level)
+                    }*/
+                    else if(altitude < hills_level) //and plains
                     {
-                        color = plain_color;
+                        if(gradient > cliff_gradient)
+                        {
+                            color = cliff_color;
+                        }
+                        else if(gradient > hills_gradient)
+                        {
+                            color = hills_color;
+                        }
+                        else
+                        {
+                            color = plain_color;
+                        }
                     }
                     else if(altitude < plateau_level)
                     {
