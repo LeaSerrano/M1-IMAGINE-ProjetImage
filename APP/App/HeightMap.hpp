@@ -33,21 +33,85 @@ using namespace siv;
 #define suggestedPeaksCurve 4
 
 
+
 class HeightMap
 {
 
 public:
 
-    static ImageBase* baseMap()
+     static ImageBase* generateLargeImage()
     {
-        int width = DataManager::instance->requestValue("map_size"); int height = width;
+        int width = DataManager::instance->requestValue("map_size"); 
+        int height = width;
         double scale = DataManager::instance->requestValue("map_scale");
 
         ImageBase* large = Noise::generatePerlin(width,height,scale,1);
 
-        large = Utilities::remap(large,0,255);
-
         return large;
+    }
+
+    static ImageBase* generateSmallImage()
+    {
+        int width = DataManager::instance->requestValue("map_size"); 
+        int height = width;
+        double scale = DataManager::instance->requestValue("map_scale");
+
+        ImageBase* small = Noise::generatePerlin(width,height,scale*2,1);
+
+        return small;
+    }
+
+    static ImageBase* baseMap(ImageBase* imageLarge, ImageBase* imageSmall, ImageBase* seaBinary)
+    {
+        int width = DataManager::instance->requestValue("map_size"); 
+        int height = width;
+        double scale = DataManager::instance->requestValue("map_scale");
+
+        float sea_level = DataManager::instance->requestValue("sea_level");
+
+        float distorsionValue = 0.5;//DataManager::instance->requestValue("distorsion");
+
+        ImageBase* image = new ImageBase(width,height,false);
+
+        for(int y = 0; y < height ; y++)
+        {
+            for(int x = 0; x < width; x++)
+            {   
+                float valueLarge = (float)(imageLarge->get(x, y, 0))/255;
+                float valueSmall = (float)(imageSmall->get(x, y, 0))/255;
+
+                //if (seaBinary->get(x, y, 0) == 255) {
+                    /*valueSmall -= 0.5;
+                    float newValue = valueLarge + distorsionValue*valueSmall;
+
+                    std::cout << newValue << " " << valueLarge << " " << valueSmall << std::endl;
+
+                    if (newValue > 1) {
+                        newValue = 1;
+                    }
+                    else if (newValue < 0) {
+                        newValue = 0;
+                    }*/
+
+                    float newValue = (4*valueLarge + valueSmall)/5;
+
+                    image->set(x,y,0,(int)(newValue*255));
+                /*}
+                else {
+                    float newValue = (valueLarge + valueSmall)/2;
+
+                    if (newValue > sea_level*255) {
+                        newValue = sea_level*255;
+                    }
+
+                    image->set(x,y,0,(int)(newValue));
+                }*/
+            }
+        }
+
+        image = Utilities::remap(image,0,255);
+
+        return image;
     }
 
     static double seaCurve(double value,double sea_level,double sea_slope,double shore_level)

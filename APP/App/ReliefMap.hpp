@@ -33,7 +33,7 @@ public:
     inline static Color plateau_color = Color(100,100,80);; //Plateau and peak level, small gradient
     inline static Color peaks_color = Color(200,200,200);;   //Plateau and peak level, high gradient
 
-    inline static double hills_gradient = 0.75;
+    inline static double hills_gradient = 0.77;
     inline static double cliff_gradient = 0.85;
 
     /*static void setup()

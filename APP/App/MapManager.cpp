@@ -56,8 +56,12 @@ ImageBase* MapManager::generateMap(string id)
     {
         default: cout << ">> Requested map <" << id << "> doesnt exist ! " << endl; break;
 
-        case "HEIGHT_BASE"_sh: maps[id] = HeightMap::baseMap(); break;
-        case "SEA_BINARY"_sh: maps[id] = HeightMap::seaBinaryMap(requestMap("HEIGHT_BASE")); break;
+        case "HEIGHT_LARGE"_sh: maps[id] = HeightMap::generateLargeImage(); break;
+        case "HEIGHT_SMALL"_sh: maps[id] = HeightMap::generateSmallImage(); break;
+        
+        case "SEA_BINARY"_sh: maps[id] = HeightMap::seaBinaryMap(requestMap("HEIGHT_LARGE")); break;
+
+        case "HEIGHT_BASE"_sh: maps[id] = HeightMap::baseMap(requestMap("HEIGHT_LARGE"), requestMap("HEIGHT_SMALL"), requestMap("SEA_BINARY")); break;
 
         case "HEIGHT_SEA"_sh: maps[id] = HeightMap::applySea(requestMap("HEIGHT_BASE")); break;
         case "HEIGHT_LAND"_sh: maps[id] = HeightMap::applyLand(requestMap("HEIGHT_SEA")); break;

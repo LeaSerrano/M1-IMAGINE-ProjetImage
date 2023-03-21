@@ -80,10 +80,14 @@ int main(int argc, char **argv)
 	dataManager->setupValue("map_scale");
 
 	cout << endl << "--  Lets start by generating the base height map :" << endl;
-	makeMap("HEIGHT_BASE");
+	makeMap("HEIGHT_LARGE");
+
+	makeMap("HEIGHT_SMALL");
 
 	cout << endl << "--  Choose sea-level :" << endl;
 	makeMap("SEA_BINARY");
+
+	makeMap("HEIGHT_BASE");
 
 	cout << endl << "--  Lets refine the height map with sea-parameters :" << endl;
 	makeMap("HEIGHT_SEA");
