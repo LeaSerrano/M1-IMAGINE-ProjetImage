@@ -338,7 +338,7 @@ public:
 
                 dx = 128 + (dx * 128);
                 dy = 128 + (dy * 128);
-                norm = 128 + (norm * 128);
+                norm *= 255;
 
                 if (dx < 0) {
                     dx = 0;
