@@ -48,7 +48,7 @@ public:
         peaks_color = Color(200,200,200);
     }*/
 
-    static ImageBase* reliefMap(ImageBase* gradientMap, ImageBase* heightMap)
+    static ImageBase* reliefMap(ImageBase* gradientMap, ImageBase* heightMap,ImageBase* seaBinary)
     {
         //setup();
 
@@ -69,7 +69,7 @@ public:
                 float altitude = (float)(heightMap->get(x, y, 0)) / 255.0;
                 float gradient = (float)(gradientMap->get(x,y,2)) / 255.0;
 
-                if(altitude < sea_level)
+                if(seaBinary->get(x,y,0) <= 0)
                 {
                     altitude /= sea_level;
                     if(altitude < 1.0-shore_level)

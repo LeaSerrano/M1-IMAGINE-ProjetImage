@@ -11,6 +11,7 @@
 #include "MapManager.h"
 #include "HeightMap.hpp"
 #include "ReliefMap.hpp"
+#include "RiverMap.hpp"
 
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
@@ -58,10 +59,10 @@ ImageBase* MapManager::generateMap(string id)
 
         case "HEIGHT_LARGE"_sh: maps[id] = HeightMap::generateLargeImage(); break;
         case "HEIGHT_SMALL"_sh: maps[id] = HeightMap::generateSmallImage(); break;
-        
-        case "SEA_BINARY"_sh: maps[id] = HeightMap::seaBinaryMap(requestMap("HEIGHT_LARGE")); break;
 
-        case "HEIGHT_BASE"_sh: maps[id] = HeightMap::baseMap(requestMap("HEIGHT_LARGE"), requestMap("HEIGHT_SMALL"), requestMap("SEA_BINARY")); break;
+        case "HEIGHT_BASE"_sh: maps[id] = HeightMap::baseMap(requestMap("HEIGHT_LARGE"), requestMap("HEIGHT_SMALL")); break;
+
+        case "SEA_BINARY"_sh: maps[id] = HeightMap::seaBinaryMap(requestMap("HEIGHT_BASE")); break;
 
         case "HEIGHT_SEA"_sh: maps[id] = HeightMap::applySea(requestMap("HEIGHT_BASE")); break;
         case "HEIGHT_LAND"_sh: maps[id] = HeightMap::applyLand(requestMap("HEIGHT_SEA")); break;
@@ -73,7 +74,7 @@ ImageBase* MapManager::generateMap(string id)
 
         case "RIVER"_sh: maps[id] = RiverMap::riverMap(requestMap("HEIGHT_GRADIENT"),requestMap("SEA_BINARY")); break;
 
-        case "RELIEF"_sh: maps[id] = ReliefMap::reliefMap(requestMap("HEIGHT_GRADIENT"),requestMap("HEIGHT_BASE")); break;
+        case "RELIEF"_sh: maps[id] = ReliefMap::reliefMap(requestMap("HEIGHT_GRADIENT"),requestMap("HEIGHT_BASE"),requestMap("SEA_BINARY")); break;
 
     }
     return maps[id] ;

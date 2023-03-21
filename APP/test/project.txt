@@ -1,5 +1,5 @@
 beach_curve:2
-beach_level:0.1
+beach_level:0.08
 hills_amplitude:0.03
 hills_frequency:5
 hills_level:0.65
@@ -10,6 +10,6 @@ plain_curve:1.3
 plain_level:0.45
 plateau_curve:0.5
 plateau_level:0.9
-sea_level:0.54
+sea_level:0.627
 sea_slope:2
-shore_level:0.02
+shore_level:0.07

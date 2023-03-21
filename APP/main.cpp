@@ -84,10 +84,11 @@ int main(int argc, char **argv)
 
 	makeMap("HEIGHT_SMALL");
 
-	cout << endl << "--  Choose sea-level :" << endl;
-	makeMap("SEA_BINARY");
-
 	makeMap("HEIGHT_BASE");
+
+	cout << endl << "--  Choose sea-level :" << endl;
+
+	makeMap("SEA_BINARY");
 
 	cout << endl << "--  Lets refine the height map with sea-parameters :" << endl;
 	makeMap("HEIGHT_SEA");

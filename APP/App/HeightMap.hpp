@@ -61,7 +61,7 @@ public:
         return small;
     }
 
-    static ImageBase* baseMap(ImageBase* imageLarge, ImageBase* imageSmall, ImageBase* seaBinary)
+    static ImageBase* baseMap(ImageBase* imageLarge, ImageBase* imageSmall)
     {
         int width = DataManager::instance->requestValue("map_size"); 
         int height = width;
@@ -80,32 +80,9 @@ public:
                 float valueLarge = (float)(imageLarge->get(x, y, 0))/255;
                 float valueSmall = (float)(imageSmall->get(x, y, 0))/255;
 
-                //if (seaBinary->get(x, y, 0) == 255) {
-                    /*valueSmall -= 0.5;
-                    float newValue = valueLarge + distorsionValue*valueSmall;
+                float newValue = (4*valueLarge + valueSmall)/5;
 
-                    std::cout << newValue << " " << valueLarge << " " << valueSmall << std::endl;
-
-                    if (newValue > 1) {
-                        newValue = 1;
-                    }
-                    else if (newValue < 0) {
-                        newValue = 0;
-                    }*/
-
-                    float newValue = (4*valueLarge + valueSmall)/5;
-
-                    image->set(x,y,0,(int)(newValue*255));
-                /*}
-                else {
-                    float newValue = (valueLarge + valueSmall)/2;
-
-                    if (newValue > sea_level*255) {
-                        newValue = sea_level*255;
-                    }
-
-                    image->set(x,y,0,(int)(newValue));
-                }*/
+                image->set(x,y,0,(int)(newValue*255));
             }
         }
 
