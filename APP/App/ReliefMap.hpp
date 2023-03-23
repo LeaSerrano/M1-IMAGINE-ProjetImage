@@ -25,16 +25,20 @@ class ReliefMap
 public:
 
     inline static Color sea_color = Color(30,30,255);;     //Main sea
-    inline static Color shore_color = Color(100,100,255);   //Not deep sea
+    inline static Color shore_color = Color(30,80,255);   //Not deep sea
+
+    inline static Color river_color = Color(30,150,255);;   //Plateau and peak level, high gradient
+
     inline static Color beach_color = Color(200,200,50);;   //Beach level, small gradient
     inline static Color plain_color = Color(100,255,100);;   //Plain and hills level, small gradient
     inline static Color hills_color = Color(80,200,80);;   //Plain and Hills level, medium gradient
-    inline static Color cliff_color = Color(50,50,50);;   //Above sea level, high gradient
     inline static Color plateau_color = Color(100,100,80);; //Plateau and peak level, small gradient
     inline static Color peaks_color = Color(200,200,200);;   //Plateau and peak level, high gradient
 
-    inline static double hills_gradient = 0.77;
-    inline static double cliff_gradient = 0.85;
+    inline static Color cliff_color = Color(50,50,50);;   //Above sea level, high gradient
+
+    inline static double hills_gradient = 0.4;
+    inline static double cliff_gradient = 0.8;
 
     /*static void setup()
     {
@@ -48,7 +52,7 @@ public:
         peaks_color = Color(200,200,200);
     }*/
 
-    static ImageBase* reliefMap(ImageBase* gradientMap, ImageBase* heightMap,ImageBase* seaBinary)
+    static ImageBase* reliefMap(ImageBase* gradientMap, ImageBase* heightMap,ImageBase* seaBinary,ImageBase* riverMap)
     {
         //setup();
 
@@ -80,6 +84,10 @@ public:
                     {
                         color = shore_color;
                     }
+                }
+                else if(riverMap->get(x,y,0) > 0)
+                {
+                    color = river_color;
                 }
                 else
                 {

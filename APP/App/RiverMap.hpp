@@ -27,7 +27,7 @@ using namespace siv;
 #define river_split_angle 0.785//45°
 
 #define river_end_gradient 0.02
-#define river_min_proximity 2 //In river_width
+#define river_min_proximity 3 //In river_width
 
 class RiverMap
 {
@@ -126,8 +126,8 @@ public:
                     double dirX2 = cos(-river_split_angle)*gradientX - sin(-river_split_angle)*gradientY;
                     double dirY2 = sin(-river_split_angle)*gradientX + cos(-river_split_angle)*gradientY;
 
-                    int l1 = drawRiver(x,y, allRivers,riverMap,river_width / 2.0, gradientMap,heightMap,depth+1,dirX1,dirY1);
-                    int l2 = drawRiver(x,y, allRivers,riverMap,river_width / 2.0, gradientMap,heightMap,depth+1,dirX2,dirY2);
+                    int l1 = drawRiver(x,y, allRivers,riverMap,river_width - 1, gradientMap,heightMap,depth+1,dirX1,dirY1);
+                    int l2 = drawRiver(x,y, allRivers,riverMap,river_width - 1, gradientMap,heightMap,depth+1,dirX2,dirY2);
 
                     lenght += l1 + l2;
                     break;
@@ -166,7 +166,6 @@ public:
             {
                 if(allRivers->get(x,y,0) <= 0 && riverMap->get(x,y,0) > 0)
                 {
-                    bool has = false;
                     for(int dx = -r; dx <= r; dx++)
                     {
                         for(int dy = -r; dy <= r; dy++)
@@ -176,7 +175,7 @@ public:
                             float d = sqrt((dx*dx) + (dy*dy));
                             if(d <= river_width);
                             {
-                                allRivers->set(x,y,255);
+                                allRivers->set(x+dx,y+dy,0,255);
                             }
                         }
                     }

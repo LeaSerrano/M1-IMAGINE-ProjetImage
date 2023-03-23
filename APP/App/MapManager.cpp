@@ -74,7 +74,7 @@ ImageBase* MapManager::generateMap(string id)
 
         case "RIVER"_sh: maps[id] = RiverMap::riverMap(requestMap("HEIGHT_GRADIENT"),requestMap("HEIGHT_BASE"),requestMap("SEA_BINARY")); break;
 
-        case "RELIEF"_sh: maps[id] = ReliefMap::reliefMap(requestMap("HEIGHT_GRADIENT"),requestMap("HEIGHT_BASE"),requestMap("SEA_BINARY")); break;
+        case "RELIEF"_sh: maps[id] = ReliefMap::reliefMap(requestMap("HEIGHT_GRADIENT"),requestMap("HEIGHT_BASE"),requestMap("SEA_BINARY"),requestMap("RIVER")); break;
 
     }
     return maps[id] ;

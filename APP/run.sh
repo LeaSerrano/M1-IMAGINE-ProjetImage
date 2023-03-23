@@ -1,4 +1,4 @@
 clear
 make clean
 make
-./main $1
+./main $1 $2

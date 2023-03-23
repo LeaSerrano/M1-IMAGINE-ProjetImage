@@ -23,20 +23,25 @@ MapManager* mapManager;
 ProjectManager* projectManager;
 DataManager* dataManager;
 
+char* targetMap;
+
 void makeMap(string id)
 {
-	do
+	if(targetMap == "" || targetMap == id)
 	{
-		mapManager->requestMap(id); mapManager->saveMap(id);
-
-		cout << ">> Satisfied with this map ? (y/n) : ";
-		string line; getline(std::cin, line);
-		if(line != "n")	{	break;	}
-		else
+		do
 		{
-			mapManager->deleteMap(id);
-		}
-	}while(true);
+			mapManager->requestMap(id); mapManager->saveMap(id);
+
+			cout << ">> Satisfied with this map ? (y/n) : ";
+			string line; getline(std::cin, line);
+			if(line != "n")	{	break;	}
+			else
+			{
+				mapManager->deleteMap(id);
+			}
+		}while(true);
+	}
 }
 
 
@@ -56,6 +61,7 @@ void tests()
 int main(int argc, char **argv)
 {
 	srand (time(NULL));
+	targetMap = (char*)"";
 
 	dataManager = new DataManager();
 
@@ -64,6 +70,8 @@ int main(int argc, char **argv)
 	if(argc >= 2)
 	{
 		projectManager = new ProjectManager(argv[1]);
+
+		if(argc >= 3) {targetMap = argv[2];}
 	}
 	else
 	{
