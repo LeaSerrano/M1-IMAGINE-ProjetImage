@@ -129,7 +129,7 @@ public:
                     int l1 = drawRiver(x,y, allRivers,riverMap,river_width / 2.0, gradientMap,heightMap,depth+1,dirX1,dirY1);
                     int l2 = drawRiver(x,y, allRivers,riverMap,river_width / 2.0, gradientMap,heightMap,depth+1,dirX2,dirY2);
 
-                    lenght += max(l1,l2);
+                    lenght += l1 + l2;
                     break;
                 }
             }
