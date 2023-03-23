@@ -80,7 +80,7 @@ public:
                 float valueLarge = (float)(imageLarge->get(x, y, 0))/255;
                 float valueSmall = (float)(imageSmall->get(x, y, 0))/255;
 
-                float newValue = (4*valueLarge + valueSmall)/5;
+                float newValue = (3*valueLarge + valueSmall)/4.0;
 
                 image->set(x,y,0,(int)(newValue*255));
             }
@@ -274,6 +274,57 @@ public:
         //PPM image : gradient will be stored as a vector + norm using RGB (dx , dy , norm)
         ImageBase* outImg = new ImageBase(width,height,true);
 
+        int delta = (int)((width / 1024.0) * 3);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                double centerValue = heightMap->get(x,y,0) / 255.0;
+
+                double count = 0; double vx = 0; double vy = 0;
+                for(int dx = -delta; dx <= delta; dx++)
+                {
+                    if(x + dx < 0 || x + dx >= width){continue;}
+                    for(int dy = -delta; dy <= delta; dy++)
+                    {
+                        if(y + dy < 0 || y + dy >= height){continue;}
+
+                        double vn = centerValue - (heightMap->get(x + dx,y + dy,0) / 255.0);
+                        double dn = 1+sqrt((dx*dx) + (dy*dy));
+                        vx += (dx * vn) / dn;
+                        vy += (dy * vn) / dn;
+
+                        count++;
+                    }
+                }
+
+                vx /= count; vx *= 100;
+                vy /= count; vy *= 100;
+                double norm = sqrt((vx*vx) + (vy*vy));
+                vx /= norm;
+                vy /= norm;
+
+                //cout << vx << "  " << vy << "  " << norm << endl;
+
+                outImg->set(x,y,0,(int)max(0.0,min(255.0,128 + (vx*128))));
+                outImg->set(x,y,1,(int)max(0.0,min(255.0,128 + (vy*128))));
+                outImg->set(x,y,2,(int)max(0.0,min(255.0,norm*255)));
+            }
+        }
+
+        return outImg;
+    }
+
+    /*
+    static ImageBase* gradientMap(ImageBase* heightMap)
+    {
+        int width = heightMap->getWidth();
+        int height = heightMap->getHeight();
+
+        //PPM image : gradient will be stored as a vector + norm using RGB (dx , dy , norm)
+        ImageBase* outImg = new ImageBase(width,height,true);
+
         float dx, dy, norm;
         float valueUp1, valueUp2, valueUp3, valueRight1, valueRight2, valueRight3, valueDiag1, valueDiag2, valueDiag3, value;
 
@@ -381,7 +432,7 @@ public:
         }
 
         return outImg;
-    }
+    }*/
 
     static ImageBase* getImageR(ImageBase* image)
     {
