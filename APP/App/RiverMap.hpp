@@ -29,11 +29,34 @@ using namespace siv;
 #define river_end_gradient 0.02
 #define river_min_proximity 3 //In river_width
 
+#define base_sources_distance 10 //In kilometers
+
 class RiverMap
 {
 
 public:
 
+    static void drawRiverPoint(int x, int y, float radius, ImageBase* riverMap,int river_width)
+    {
+        int r = (int)radius;
+        for(int dx = -r; dx <= r; dx++)
+        {
+            for(int dy = -r; dy <= r; dy++)
+            {
+                if(x + dx < 0 || x + dx >= riverMap->getWidth() || y + dy < 0 || y + dy >= riverMap->getHeight()){continue;}
+
+                float d = sqrt((dx*dx) + (dy*dy));
+                if(d <= radius)
+                {
+                    riverMap->set(x + dx,y + dy,0,255);
+                    riverMap->set(x + dx,y + dy,1,river_width);
+                    riverMap->set(x + dx,y + dy,2,0);
+                }
+            }
+        }
+    }
+
+    /*
     static void selectRiver(int& riverStartX, int& riverStartY, ImageBase* allRivers, ImageBase* seaBinary)
     {
         double randX = (rand() / (double)RAND_MAX); randX = max(0.05,min(0.9,randX)); //Select an x between 10% and 70% of the map width
@@ -61,24 +84,6 @@ public:
         }while(!ok);
     }
 
-    static void drawRound(int x, int y, float radius, ImageBase* riverMap)
-    {
-        int r = (int)radius;
-        for(int dx = -r; dx <= r; dx++)
-        {
-            for(int dy = -r; dy <= r; dy++)
-            {
-                if(x + dx < 0 || x + dx >= riverMap->getWidth() || y + dy < 0 || y + dy >= riverMap->getHeight()){continue;}
-
-                float d = sqrt((dx*dx) + (dy*dy));
-                if(d <= radius)
-                {
-                    riverMap->set(x + dx,y + dy,0,255);
-                }
-            }
-        }
-    }
-
     static int drawRiver(int startX, int startY, ImageBase* allRivers, ImageBase* riverMap, double river_width, ImageBase* gradientMap,ImageBase* heightMap, int depth, double dirX, double dirY)
     {
         int lenght = 0;
@@ -94,9 +99,6 @@ public:
             double gradientX = -(gradientMap->get(x,y,0)-128) / 128.0;
             double gradientY = -(gradientMap->get(x,y,1)-128) / 128.0;
             double gradientNorm = gradientMap->get(x,y,2) / 255.0;
-            //Normalisation du gradient
-            //gradientX /= gradientNorm;
-            //gradientY /= gradientNorm;
             //Extension pour avoir x et y >= 1
             double m = max(1.0/river_width,min(abs(gradientX),abs(gradientY)));
             gradientX /= m;
@@ -184,9 +186,128 @@ public:
         }
 
         return lenght;
+    }*/
+
+    static void selectSources(vector<int>& X, vector<int>& Y, ImageBase* heightMap, double sources_distance, int sources_count)
+    {
+        vector<int> xList,yList,hList;
+
+        for(int x = 0; x < heightMap->getWidth(); x++)
+        {
+            for(int y = 0; y < heightMap->getHeight(); y++)
+            {
+                xList.push_back(x);
+                yList.push_back(y);
+                hList.push_back(heightMap->get(x,y,0));
+            }
+        }
+
+        vector<size_t> order(hList.size());
+        iota(order.begin(), order.end(), 0);
+        sort(order.begin(), order.end(), [&](size_t a, size_t b) {  return hList[a] > hList[b]; });
+
+        vector<int> xList2,yList2; xList2.resize(xList.size()); yList2.resize(yList.size());
+        vector<double> hList2; hList2.resize(hList.size());
+        for(int i = 0; i < order.size(); i++)
+        {
+            xList2[i] = xList[order[i]];
+            yList2[i] = yList[order[i]];
+            hList2[i] = hList[order[i]] / 255.0;
+        }
+
+        X.push_back(xList2[0]); xList2.erase(xList2.begin());
+        Y.push_back(yList2[0]); yList2.erase(yList2.begin());
+
+        for(int p = 0; p < xList2.size(); p++)
+        {
+            bool record = true;
+            for(int i = 0; i < X.size(); i++)
+            {
+                double dx = (xList2[p] - X[i]);
+                double dy = (yList2[p] - Y[i]);
+                if(sqrt(dx*dx + dy*dy) <= sources_distance){record = false; break;}
+            }
+
+            if(record)
+            {
+                X.push_back(xList2[p]);
+                Y.push_back(yList2[p]);
+
+                if(X.size() >= sources_count){break;}
+            }
+        }
+
     }
 
+    static void drawRiver(int startX, int startY, double river_width, ImageBase* riverMap,ImageBase* gradientMap, ImageBase* seaBinary)
+    {
+        int x = startX,y = startY;
+        for(int lenght = 0; lenght < 5000; lenght++)
+        {
+            double gradientX = (gradientMap->get(x,y,0)-128) / 128.0;
+            double gradientY = (gradientMap->get(x,y,1)-128) / 128.0;
+            double gradientNorm = gradientMap->get(x,y,2) / 255.0;
+            //Extension pour avoir x et y >= 1
+            double m = max(1.0/river_width,min(abs(gradientX),abs(gradientY)));
+            gradientX /= m;
+            gradientY /= m;
+
+            drawRiverPoint(x,y,river_width,riverMap,(int)(river_width * 10.0));
+
+            double s = max(2.5,river_width * 0.25);
+            x += (int)(gradientX * s); y += (int)(gradientY * s);
+
+            if(riverMap->get(x,y,1) > river_width*10.0)
+            {
+                river_width += riverMap->get(x,y,1) / 10.0;
+            }
+
+            if(x < 0 || x >= riverMap->getWidth() || y < 0 || y >= riverMap->getHeight()){break;}
+            if(seaBinary->get(x,y,0) <= 0){break;}
+        }
+    }
+
+    static void drawRivers(int startX, int startY, double river_width, double source_width, ImageBase* riverMap,ImageBase* gradientMap, ImageBase* seaBinary)
+    {
+        drawRiver((int)(startX + source_width), startY,river_width,riverMap,gradientMap,seaBinary);
+        drawRiver((int)(startX - source_width), startY,river_width,riverMap,gradientMap,seaBinary);
+        drawRiver(startX, (int)(startY + source_width),river_width,riverMap,gradientMap,seaBinary);
+        drawRiver(startX, (int)(startY - source_width),river_width,riverMap,gradientMap,seaBinary);
+
+        drawRiver((int)(startX + source_width), (int)(startY + source_width),river_width,riverMap,gradientMap,seaBinary);
+        drawRiver((int)(startX - source_width), (int)(startY + source_width),river_width,riverMap,gradientMap,seaBinary);
+        drawRiver((int)(startX + source_width), (int)(startY - source_width),river_width,riverMap,gradientMap,seaBinary);
+        drawRiver((int)(startX - source_width), (int)(startY - source_width),river_width,riverMap,gradientMap,seaBinary);
+    }
+
+    static ImageBase* riverMap(ImageBase* gradientMap, ImageBase* heightMap, ImageBase* seaBinary)
+    {
+        ImageBase* map = new ImageBase(gradientMap->getWidth(),gradientMap->getHeight(),true);
+
+        double mapKm =  DataManager::instance->requestValue("map_scale") ;
+        double mapSize = DataManager::instance->requestValue("map_size");
+        double kmPerPixel = mapKm / mapSize;
+
+        double river_width = (0.1 / kmPerPixel) ;// * 4;
+
+        double sources_distance = base_sources_distance / kmPerPixel;
+        int sources_count = 15;
+
+        double source_width = river_width * 3;
+
+        vector<int> startsX,startsY;
+        selectSources(startsX,startsY,heightMap,sources_distance,sources_count);
+
+        for(int i = 0; i < sources_count; i++)
+        {
+            drawRivers(startsX[i],startsY[i],river_width,source_width,map,gradientMap,seaBinary);
+        }
+
+
+        return map;
+    }
    
+   /*
     static ImageBase* riverMap(ImageBase* gradientMap, ImageBase* heightMap, ImageBase* seaBinary)
     {
         ImageBase* map = new ImageBase(gradientMap->getWidth(),gradientMap->getHeight(),false);
@@ -248,7 +369,7 @@ public:
         }
 
         return map;
-    }
+    }*/
 
 
 };
