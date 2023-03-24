@@ -30,7 +30,9 @@ using namespace siv;
 #define river_min_proximity 3 //In river_width*/
 
 #define base_sources_distance 10 //In kilometers
-#define lake_height_diff 0.01  //Multiplied by river_width
+#define lake_gradient_diff 0.1  //Multiplied by river_width
+#define lake_spread_restrictor 0.98 //Reduce river_width for each lake-dilatation step, decreasing needed lake_gradient_diff
+#define river_combine_increment 1.25
 
 class RiverMap
 {
@@ -241,10 +243,14 @@ public:
 
     }
 
-    static void drawRiver(int startX, int startY, double river_width, ImageBase* riverMap,ImageBase* gradientMap, ImageBase* seaBinary, ImageBase* heightMap)
+    static void drawRiver(int startX, int startY, double river_width, ImageBase* riverMap,ImageBase* gradientMap, ImageBase* seaBinary,ImageBase* heightMap)
     {
-        int x = startX,y = startY;
-        for(int lenght = 0; lenght < 5000; lenght++)
+        ImageBase* map = new ImageBase(riverMap->getWidth(),riverMap->getHeight(),true);
+
+        int x = startX,y = startY; double lastTouchedRiverWidth = 0;
+        int maxLenght = riverMap->getHeight(); bool reachedSea = false;
+
+        for(int lenght = 0; lenght < maxLenght; lenght++)
         {
             double gradientX = (gradientMap->get(x,y,0)-128) / 128.0;
             double gradientY = (gradientMap->get(x,y,1)-128) / 128.0;
@@ -254,22 +260,39 @@ public:
             gradientX /= m;
             gradientY /= m;
 
-            drawRiverPoint(x,y,river_width,(int)(river_width * 10.0),riverMap,heightMap);
+            drawRiverPoint(x,y,river_width,(int)(river_width * 10.0),map,heightMap);
 
             double s = max(2.5,river_width * 0.25);
             x += (int)(gradientX * s); y += (int)(gradientY * s);
 
-            if(riverMap->get(x,y,1) > river_width*10.0)
+            if(riverMap->get(x,y,1) > (int)(lastTouchedRiverWidth*10.0))
             {
-                river_width += riverMap->get(x,y,1) / 10.0;
+                lastTouchedRiverWidth = (riverMap->get(x,y,1) / 10.0);
+                river_width = lastTouchedRiverWidth * river_combine_increment; // lastTouchedRiverWidth;
             }
 
-            if(x < 0 || x >= riverMap->getWidth() || y < 0 || y >= riverMap->getHeight()){break;}
-            if(seaBinary->get(x,y,0) <= 0){break;}
+            if(x < 0 || x >= map->getWidth() || y < 0 || y >= map->getHeight()){break;}
+            if(seaBinary->get(x,y,0) <= 0){ reachedSea = true; break;}
+        }
+
+        if(reachedSea)
+        {
+            for(int i = 0; i < riverMap->getSize();i++)
+            {
+                if(riverMap->get(i,0) <= 0 || map->get(i,0) > 0)
+                {
+                    riverMap->set(i,0, map->get(i,0));
+                    riverMap->set(i,1, map->get(i,1));
+                    riverMap->set(i,2, map->get(i,2));
+                }
+            }
+
+            //riverMap->save("./test.ppm"); int v;
+            //cin>>v;
         }
     }
 
-    static void drawRivers(int startX, int startY, double river_width, double source_width, ImageBase* riverMap,ImageBase* gradientMap, ImageBase* seaBinary, ImageBase* heightMap)
+    static void drawRivers(int startX, int startY, double river_width, double source_width, ImageBase* riverMap,ImageBase* gradientMap, ImageBase* seaBinary,ImageBase* heightMap)
     {
         drawRiver((int)(startX + source_width), startY,river_width,riverMap,gradientMap,seaBinary,heightMap);
         drawRiver((int)(startX - source_width), startY,river_width,riverMap,gradientMap,seaBinary,heightMap);
@@ -282,38 +305,43 @@ public:
         drawRiver((int)(startX - source_width), (int)(startY - source_width),river_width,riverMap,gradientMap,seaBinary,heightMap);
     }
 
-    static ImageBase* makeLakes(ImageBase* riverMap, ImageBase* heightMap)
+    static ImageBase* makeLakes(ImageBase* riverMap, ImageBase* gradientMap)
     {
         ImageBase* mapAfter = riverMap;
 
-        int steps = 5;
-        for(int i = 0; i < steps; i++)
+        int steps = 500; bool modified = true;int i = 0;
+        for(; i < steps && modified; i++)
         {
+            modified = false;
+
             ImageBase* mapBefore = mapAfter;
             mapAfter = new ImageBase(riverMap->getWidth(),riverMap->getHeight(),true);
-            for(int x = 0; x < heightMap->getWidth(); x++)
+
+            for(int x = 0; x < riverMap->getWidth(); x++)
             {
-                for(int y = 0; y < heightMap->getHeight(); y++)
+                for(int y = 0; y < riverMap->getHeight(); y++)
                 {
                     if(mapBefore->get(x,y,0) <= 0) {continue;}
 
                     double river_width = mapBefore->get(x,y,1) / 10.0;
-                    double altitude = mapBefore->get(x,y,2) / 255.0;//heightMap->get(x,y,0) / 255.0;
 
                     for(int dx = -1; dx <= 1; dx++)
                     {
                         for(int dy = -1; dy <= 1; dy++)
                         {
+                            if(dx==0 && dy == 0)   {  mapAfter->set(x,y,0,mapBefore->get(x,y,0)); mapAfter->set(x,y,1,mapBefore->get(x,y,1)); mapAfter->set(x,y,2,mapBefore->get(x,y,2));      continue;     }
                             int vx = x + dx; int vy = y + dy;
-                            if(vx < 0 || vx >= heightMap->getWidth() || vy < 0 || vy >= heightMap->getHeight()){continue;}
+                            if(vx < 0 || vx >= riverMap->getWidth() || vy < 0 || vy >= riverMap->getHeight()){continue;}
+                            if(mapBefore->get(vx,vy,0) > 0) {continue;}
 
-                            double alt = heightMap->get(vx,vy,0) / 255.0;
+                            double gradient = gradientMap->get(vx,vy,2) / 255.0;
 
-                            if(abs(alt-altitude) <= lake_height_diff*river_width)
+                            if(gradient <= lake_gradient_diff*river_width)
                             {
-                                mapAfter->set(vx,vy,0,255);
-                                mapAfter->set(vx,vy,1,mapBefore->get(x,y,1));
+                                mapAfter->set(vx,vy,0,mapBefore->get(x,y,0));
+                                mapAfter->set(vx,vy,1,(int)(river_width*10.0*lake_spread_restrictor));//mapBefore->get(x,y,1));
                                 mapAfter->set(vx,vy,2,mapBefore->get(x,y,2));
+                                modified = true;
                             }
                         }
                     }
@@ -335,9 +363,9 @@ public:
         double river_width = (0.1 / kmPerPixel) ;// * 4;
 
         double sources_distance = base_sources_distance / kmPerPixel;
-        int sources_count = 15;
+        int sources_count = 25;
 
-        double source_width = river_width * 3;
+        double source_width = river_width * 5;
 
         vector<int> startsX,startsY;
         selectSources(startsX,startsY,heightMap,sources_distance,sources_count);
@@ -347,7 +375,7 @@ public:
             drawRivers(startsX[i],startsY[i],river_width,source_width,map,gradientMap,seaBinary,heightMap);
         }
 
-        map = makeLakes(map,heightMap);
+        map = makeLakes(map,gradientMap);
 
 
         return map;

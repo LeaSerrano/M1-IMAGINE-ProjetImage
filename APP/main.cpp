@@ -29,7 +29,7 @@ void makeMap(string id)
 {
 	if(targetMap == "" || targetMap == id)
 	{
-		if(targetMap == id) mapManager->deleteMap(id);
+		if(targetMap == id) { mapManager->deleteMap(id); targetMap = (char*)""; }
 		do
 		{
 			mapManager->requestMap(id); mapManager->saveMap(id);
