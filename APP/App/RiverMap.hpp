@@ -18,7 +18,7 @@
 using namespace std;
 using namespace siv;
 
-
+/*
 #define max_river_depth 2
 
 #define river_split_min_lenght 50 //Min lenght needed before split , in river_width    river_width*this
@@ -27,16 +27,17 @@ using namespace siv;
 #define river_split_angle 0.785//45°
 
 #define river_end_gradient 0.02
-#define river_min_proximity 3 //In river_width
+#define river_min_proximity 3 //In river_width*/
 
 #define base_sources_distance 10 //In kilometers
+#define lake_height_diff 0.01  //Multiplied by river_width
 
 class RiverMap
 {
 
 public:
 
-    static void drawRiverPoint(int x, int y, float radius, ImageBase* riverMap,int river_width)
+    static void drawRiverPoint(int x, int y, float radius, int river_width, ImageBase* riverMap,ImageBase* heightMap)
     {
         int r = (int)radius;
         for(int dx = -r; dx <= r; dx++)
@@ -46,11 +47,12 @@ public:
                 if(x + dx < 0 || x + dx >= riverMap->getWidth() || y + dy < 0 || y + dy >= riverMap->getHeight()){continue;}
 
                 float d = sqrt((dx*dx) + (dy*dy));
+
                 if(d <= radius)
                 {
                     riverMap->set(x + dx,y + dy,0,255);
                     riverMap->set(x + dx,y + dy,1,river_width);
-                    riverMap->set(x + dx,y + dy,2,0);
+                    riverMap->set(x + dx,y + dy,2,heightMap->get(x,y,0));
                 }
             }
         }
@@ -239,7 +241,7 @@ public:
 
     }
 
-    static void drawRiver(int startX, int startY, double river_width, ImageBase* riverMap,ImageBase* gradientMap, ImageBase* seaBinary)
+    static void drawRiver(int startX, int startY, double river_width, ImageBase* riverMap,ImageBase* gradientMap, ImageBase* seaBinary, ImageBase* heightMap)
     {
         int x = startX,y = startY;
         for(int lenght = 0; lenght < 5000; lenght++)
@@ -252,7 +254,7 @@ public:
             gradientX /= m;
             gradientY /= m;
 
-            drawRiverPoint(x,y,river_width,riverMap,(int)(river_width * 10.0));
+            drawRiverPoint(x,y,river_width,(int)(river_width * 10.0),riverMap,heightMap);
 
             double s = max(2.5,river_width * 0.25);
             x += (int)(gradientX * s); y += (int)(gradientY * s);
@@ -267,17 +269,59 @@ public:
         }
     }
 
-    static void drawRivers(int startX, int startY, double river_width, double source_width, ImageBase* riverMap,ImageBase* gradientMap, ImageBase* seaBinary)
+    static void drawRivers(int startX, int startY, double river_width, double source_width, ImageBase* riverMap,ImageBase* gradientMap, ImageBase* seaBinary, ImageBase* heightMap)
     {
-        drawRiver((int)(startX + source_width), startY,river_width,riverMap,gradientMap,seaBinary);
-        drawRiver((int)(startX - source_width), startY,river_width,riverMap,gradientMap,seaBinary);
-        drawRiver(startX, (int)(startY + source_width),river_width,riverMap,gradientMap,seaBinary);
-        drawRiver(startX, (int)(startY - source_width),river_width,riverMap,gradientMap,seaBinary);
+        drawRiver((int)(startX + source_width), startY,river_width,riverMap,gradientMap,seaBinary,heightMap);
+        drawRiver((int)(startX - source_width), startY,river_width,riverMap,gradientMap,seaBinary,heightMap);
+        drawRiver(startX, (int)(startY + source_width),river_width,riverMap,gradientMap,seaBinary,heightMap);
+        drawRiver(startX, (int)(startY - source_width),river_width,riverMap,gradientMap,seaBinary,heightMap);
 
-        drawRiver((int)(startX + source_width), (int)(startY + source_width),river_width,riverMap,gradientMap,seaBinary);
-        drawRiver((int)(startX - source_width), (int)(startY + source_width),river_width,riverMap,gradientMap,seaBinary);
-        drawRiver((int)(startX + source_width), (int)(startY - source_width),river_width,riverMap,gradientMap,seaBinary);
-        drawRiver((int)(startX - source_width), (int)(startY - source_width),river_width,riverMap,gradientMap,seaBinary);
+        drawRiver((int)(startX + source_width), (int)(startY + source_width),river_width,riverMap,gradientMap,seaBinary,heightMap);
+        drawRiver((int)(startX - source_width), (int)(startY + source_width),river_width,riverMap,gradientMap,seaBinary,heightMap);
+        drawRiver((int)(startX + source_width), (int)(startY - source_width),river_width,riverMap,gradientMap,seaBinary,heightMap);
+        drawRiver((int)(startX - source_width), (int)(startY - source_width),river_width,riverMap,gradientMap,seaBinary,heightMap);
+    }
+
+    static ImageBase* makeLakes(ImageBase* riverMap, ImageBase* heightMap)
+    {
+        ImageBase* mapAfter = riverMap;
+
+        int steps = 5;
+        for(int i = 0; i < steps; i++)
+        {
+            ImageBase* mapBefore = mapAfter;
+            mapAfter = new ImageBase(riverMap->getWidth(),riverMap->getHeight(),true);
+            for(int x = 0; x < heightMap->getWidth(); x++)
+            {
+                for(int y = 0; y < heightMap->getHeight(); y++)
+                {
+                    if(mapBefore->get(x,y,0) <= 0) {continue;}
+
+                    double river_width = mapBefore->get(x,y,1) / 10.0;
+                    double altitude = mapBefore->get(x,y,2) / 255.0;//heightMap->get(x,y,0) / 255.0;
+
+                    for(int dx = -1; dx <= 1; dx++)
+                    {
+                        for(int dy = -1; dy <= 1; dy++)
+                        {
+                            int vx = x + dx; int vy = y + dy;
+                            if(vx < 0 || vx >= heightMap->getWidth() || vy < 0 || vy >= heightMap->getHeight()){continue;}
+
+                            double alt = heightMap->get(vx,vy,0) / 255.0;
+
+                            if(abs(alt-altitude) <= lake_height_diff*river_width)
+                            {
+                                mapAfter->set(vx,vy,0,255);
+                                mapAfter->set(vx,vy,1,mapBefore->get(x,y,1));
+                                mapAfter->set(vx,vy,2,mapBefore->get(x,y,2));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return mapAfter;
     }
 
     static ImageBase* riverMap(ImageBase* gradientMap, ImageBase* heightMap, ImageBase* seaBinary)
@@ -300,8 +344,10 @@ public:
 
         for(int i = 0; i < sources_count; i++)
         {
-            drawRivers(startsX[i],startsY[i],river_width,source_width,map,gradientMap,seaBinary);
+            drawRivers(startsX[i],startsY[i],river_width,source_width,map,gradientMap,seaBinary,heightMap);
         }
+
+        map = makeLakes(map,heightMap);
 
 
         return map;

@@ -56,7 +56,7 @@ public:
         int height = width;
         double scale = DataManager::instance->requestValue("map_scale");
 
-        ImageBase* small = Noise::generatePerlin(width,height,scale*2,1);
+        ImageBase* small = Noise::generatePerlin(width,height,scale*4,1);
 
         return small;
     }
@@ -69,7 +69,7 @@ public:
 
         float sea_level = DataManager::instance->requestValue("sea_level");
 
-        float distorsionValue = 0.5;//DataManager::instance->requestValue("distorsion");
+        double distorsionValue = 0.25;//DataManager::instance->requestValue("distorsion");
 
         ImageBase* image = new ImageBase(width,height,false);
 
@@ -77,12 +77,13 @@ public:
         {
             for(int x = 0; x < width; x++)
             {   
-                float valueLarge = (float)(imageLarge->get(x, y, 0))/255;
-                float valueSmall = (float)(imageSmall->get(x, y, 0))/255;
+                double valueLarge = (double)(imageLarge->get(x, y, 0))/255;
+                double valueSmall = (double)(imageSmall->get(x, y, 0))/255;
+                valueSmall -= 0.5;
 
-                float newValue = (3*valueLarge + valueSmall)/4.0;
+                double newValue = valueLarge + (valueSmall * distorsionValue);// (2*valueLarge + valueSmall)/3.0;
 
-                image->set(x,y,0,(int)(newValue*255));
+                image->set(x,y,0,(int)max(0.0,min(255.0,newValue*255)));
             }
         }
 
