@@ -12,6 +12,7 @@
 #include "HeightMap.hpp"
 #include "ReliefMap.hpp"
 #include "RiverMap.hpp"
+#include "PointOfInterestMap.hpp"
 
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
@@ -75,6 +76,10 @@ ImageBase* MapManager::generateMap(string id)
         case "RIVER"_sh: maps[id] = RiverMap::riverMap(requestMap("HEIGHT_GRADIENT"),requestMap("HEIGHT_BASE"),requestMap("SEA_BINARY")); break;
 
         case "RELIEF"_sh: maps[id] = ReliefMap::reliefMap(requestMap("HEIGHT_GRADIENT"),requestMap("HEIGHT_BASE"),requestMap("SEA_BINARY"),requestMap("RIVER")); break;
+
+        case "INTEREST"_sh: maps[id] = PointOfInterestMap::generatePointOfInterestMapGray(requestMap("HEIGHT_GRADIENT"),requestMap("RIVER"), requestMap("SEA_BINARY"), requestMap("RELIEF"), requestMap("HEIGHT_BASE")); break;
+        case "INTEREST_C"_sh: maps[id] = PointOfInterestMap::generatePointOfInterestMapColored(requestMap("INTEREST")); break;
+
 
     }
     return maps[id] ;
