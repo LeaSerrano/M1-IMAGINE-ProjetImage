@@ -114,6 +114,10 @@ int main(int argc, char **argv)
 	cout << endl << "--  Generate the reliefs map :" << endl;
 	makeMap("RELIEF");
 
+	cout << endl << "--  Generate the point of interest map :" << endl;
+	makeMap("INTEREST");
+	makeMap("INTEREST_C");
+
 	mapManager->saveAllMaps();
 
 	projectManager->saveData();
