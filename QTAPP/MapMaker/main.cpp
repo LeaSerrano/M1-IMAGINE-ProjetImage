@@ -117,6 +117,7 @@ int main(int argc, char **argv)
 	cout << endl << "--  Generate the point of interest map :" << endl;
 	makeMap("INTEREST");
 	makeMap("INTEREST_C");
+	makeMap("INTEREST_POINTS");
 
 	cout << endl << "--  Generate the climate map :" << endl;
 	makeMap("CLIMATE");

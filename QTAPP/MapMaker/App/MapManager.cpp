@@ -81,6 +81,7 @@ ImageBase* MapManager::generateMap(string id)
 
         case "INTEREST"_sh: maps[id] = PointOfInterestMap::generatePointOfInterestMapGray(requestMap("HEIGHT_GRADIENT"),requestMap("RIVER"), requestMap("SEA_BINARY"), requestMap("RELIEF"), requestMap("HEIGHT_BASE")); break;
         case "INTEREST_C"_sh: maps[id] = PointOfInterestMap::generatePointOfInterestMapColored(requestMap("INTEREST")); break;
+        case "INTEREST_POINTS"_sh: maps[id] = PointOfInterestMap::generatePoints(requestMap("INTEREST_C")); break;
 
         case "CLIMATE"_sh: maps[id] = ClimateMap::generateClimateMap(); break;
 
