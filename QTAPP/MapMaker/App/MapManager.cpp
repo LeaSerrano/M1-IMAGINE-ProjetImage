@@ -13,6 +13,8 @@
 #include "ReliefMap.hpp"
 #include "RiverMap.hpp"
 #include "PointOfInterestMap.hpp"
+#include "ClimateMap.hpp"
+#include "BiomeMap.hpp"
 
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
@@ -79,6 +81,10 @@ ImageBase* MapManager::generateMap(string id)
 
         case "INTEREST"_sh: maps[id] = PointOfInterestMap::generatePointOfInterestMapGray(requestMap("HEIGHT_GRADIENT"),requestMap("RIVER"), requestMap("SEA_BINARY"), requestMap("RELIEF"), requestMap("HEIGHT_BASE")); break;
         case "INTEREST_C"_sh: maps[id] = PointOfInterestMap::generatePointOfInterestMapColored(requestMap("INTEREST")); break;
+
+        case "CLIMATE"_sh: maps[id] = ClimateMap::generateClimateMap(); break;
+
+        case "BIOME"_sh: maps[id] = BiomeMap::generatePlainBiomeMap(requestMap("RELIEF"), requestMap("CLIMATE")); break;
     }
     return maps[id] ;
 }

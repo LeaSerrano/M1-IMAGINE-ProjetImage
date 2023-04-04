@@ -118,6 +118,12 @@ int main(int argc, char **argv)
 	makeMap("INTEREST");
 	makeMap("INTEREST_C");
 
+	cout << endl << "--  Generate the climate map :" << endl;
+	makeMap("CLIMATE");
+
+	cout << endl << "--  Generate the biome map :" << endl;
+	makeMap("BIOME");
+
 	mapManager->saveAllMaps();
 
 	projectManager->saveData();
