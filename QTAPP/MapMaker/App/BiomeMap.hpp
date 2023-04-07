@@ -58,24 +58,27 @@ public:
         return false;
     }
 
-    static ImageBase* generatePlainBiomeMap(ImageBase* reliefMap, ImageBase* climateMap) {
+    static ImageBase* generatePlainBiomeMap(ImageBase* reliefMap, ImageBase* climateMap,bool useDefaults) {
 
         int width = DataManager::instance->requestValue("map_size"); 
         int height = width;
         double scale = DataManager::instance->requestValue("map_scale");
 
         float desert_temperature = Utilities::quantile(climateMap,0.7) / 255.0;
-        desert_temperature = DataManager::instance->requestValue("desert_temperature",desert_temperature,true);
+        if(!useDefaults) desert_temperature = DataManager::instance->requestValue("desert_temperature",desert_temperature,true);
+        else DataManager::instance->setValue("desert_temperature",desert_temperature);
 
         float ice_temperature = Utilities::quantile(climateMap,0.3) / 255.0;
-        ice_temperature = DataManager::instance->requestValue("ice_temperature",ice_temperature,true);
+        if(!useDefaults)ice_temperature = DataManager::instance->requestValue("ice_temperature",ice_temperature,true);
+        else DataManager::instance->setValue("ice_temperature",ice_temperature);
 
         float high_humidity = Utilities::quantile(climateMap,0.7) / 255.0;
-        high_humidity = DataManager::instance->requestValue("high_humidity",high_humidity,true);
+        if(!useDefaults)high_humidity = DataManager::instance->requestValue("high_humidity",high_humidity,true);
+        else DataManager::instance->setValue("high_humidity",high_humidity);
 
         float low_humidity = Utilities::quantile(climateMap,0.3) / 255.0;
-        low_humidity = DataManager::instance->requestValue("low_humidity",low_humidity,true);
-
+        if(!useDefaults)low_humidity = DataManager::instance->requestValue("low_humidity",low_humidity,true);
+        else DataManager::instance->setValue("low_humidity",low_humidity);
 
         ImageBase* biomeMap = new ImageBase(width, height, true);
 

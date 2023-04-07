@@ -1,2 +1,8 @@
 build-MapMaker-Desktop_Qt_6_5_0_GCC_64bit-Debug/
 build-MapMaker-Desktop-Debug/
+
+MapMaker.pro.user*
+
+test/
+
+./MapMaker/main

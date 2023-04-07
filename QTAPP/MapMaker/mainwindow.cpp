@@ -169,7 +169,13 @@ void MainWindow::routine()
     int currentMapId = 0;
     while(currentMapId < MapManager::mapIdCount)
     {
+        if(mapManager->mapExists(MapManager::mapIds[currentMapId])){currentMapId++; continue;}
+
         mapStatus = 0; updateCurrentMap(MapManager::mapIds[currentMapId]);
+        if(!mapManager->mapExists(MapManager::mapIds[currentMapId]) && (MapManager::mapPreGenerate[currentMapId] || MapManager::mapDatas[MapManager::mapIds[currentMapId]].size() <= 0))
+        {
+            mapManager->generateMap(currentMap);
+        }
         setupDataInput();
         do
         {

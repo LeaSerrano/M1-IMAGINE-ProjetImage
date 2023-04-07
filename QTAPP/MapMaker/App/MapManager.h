@@ -38,8 +38,22 @@ class MapManager
 
 public:
 
-    static const int mapIdCount = 9;
-    static inline string mapIds[] = {"HEIGHT_LARGE","HEIGHT_SMALL","HEIGHT_BASE","SEA_BINARY","HEIGHT_SEA","HEIGHT_LAND","HEIGHT_GRADIENT","RIVER","RELIEF"};
+    static const int mapIdCount = 14;
+    static inline string mapIds[] = {
+        "HEIGHT_LARGE","HEIGHT_SMALL","HEIGHT_BASE","SEA_BINARY","HEIGHT_SEA","HEIGHT_LAND","HEIGHT_GRADIENT",
+        "RIVER",
+        "RELIEF",
+        "CLIMATE","BIOME",
+        "INTEREST","INTEREST_C","INTEREST_POINTS"
+        };
+
+    static inline bool mapPreGenerate[] = {
+        false,false,false,true,false,false,false,
+        false,
+        false,
+        false,true,
+        false,false,false
+    };
 
     static inline map<string,vector<string>> mapDatas;
     void setupMapDatas()
@@ -53,6 +67,11 @@ public:
         mapDatas["HEIGHT_GRADIENT"] =  {};
         mapDatas["RIVER"] = {};
         mapDatas["RELIEF"] =  {};
+        mapDatas["INTEREST"] =  {};
+        mapDatas["INTEREST_C"] =  {};
+        mapDatas["INTEREST_POINTS"] =  {};
+        mapDatas["CLIMATE"] =  {};
+        mapDatas["BIOME"] =  {"desert_temperature","ice_temperature","high_humidity","low_humidity"};
     }
 
     map<string,ImageBase*> maps;

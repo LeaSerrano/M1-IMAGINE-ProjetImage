@@ -28,7 +28,10 @@ HEADERS += \
     ./App/Noise.hpp \
     ./Library/image_ppm.h \
     ./Library/ImageBase.h \
-    ./Library/PerlinNoise.hpp
+    ./Library/PerlinNoise.hpp \
+    ./App/PointOfInterestMap.hpp \
+    ./App/ClimateMap.hpp \
+    ./App/BiomeMap.hpp
 
 FORMS += \
     mainwindow.ui

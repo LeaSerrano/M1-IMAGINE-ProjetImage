@@ -45,6 +45,7 @@ public:
            {
                {"map_size",range(1024,8192,2048)},
                {"map_scale",range(25,500,200)},
+
                {"sea_level",range(0,1,0.5)},
                {"sea_slope",range(1,5,2)},
                {"shore_level",range(0.05,0.35,0.2)},
@@ -57,7 +58,12 @@ public:
                {"hills_frequency",range(1,10,5)},
                {"plateau_level",range(0.7,0.9,0.9)},
                {"plateau_curve",range(0.1,2,0.5)},
-               {"peaks_curve",range(1,5,4)}
+               {"peaks_curve",range(1,5,4)},
+
+               {"desert_temperature",range(0,1,0.7)},
+               {"ice_temperature",range(0,1,0.3)},
+               {"high_humidity",range(0,1,0.7)},
+               {"low_humidity",range(0,1,0.3)}
            };
    }
 

@@ -65,7 +65,7 @@ ImageBase* MapManager::generateMap(string id)
 
         case "HEIGHT_BASE"_sh: maps[id] = HeightMap::baseMap(requestMap("HEIGHT_LARGE"), requestMap("HEIGHT_SMALL")); break;
 
-        case "SEA_BINARY"_sh: maps[id] = HeightMap::seaBinaryMap(requestMap("HEIGHT_BASE")); break;
+        case "SEA_BINARY"_sh: maps[id] = HeightMap::seaBinaryMap(requestMap("HEIGHT_BASE"),maps.count(id) <= 0); break;
 
         case "HEIGHT_SEA"_sh: maps[id] = HeightMap::applySea(requestMap("HEIGHT_BASE")); break;
         case "HEIGHT_LAND"_sh: maps[id] = HeightMap::applyLand(requestMap("HEIGHT_SEA")); break;
@@ -85,7 +85,7 @@ ImageBase* MapManager::generateMap(string id)
 
         case "CLIMATE"_sh: maps[id] = ClimateMap::generateClimateMap(); break;
 
-        case "BIOME"_sh: maps[id] = BiomeMap::generatePlainBiomeMap(requestMap("RELIEF"), requestMap("CLIMATE")); break;
+        case "BIOME"_sh: maps[id] = BiomeMap::generatePlainBiomeMap(requestMap("RELIEF"), requestMap("CLIMATE"),maps.count(id) <= 0); break;
     }
     return maps[id] ;
 }

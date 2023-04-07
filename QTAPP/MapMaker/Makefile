@@ -6,7 +6,7 @@
 BIN=main
 
 # liste des fichiers sources 
-MAIN=main.cpp
+MAIN=main_console.cpp
 IMAGE=Library/ImageBase.cpp
 MAPMANAGER=App/MapManager.cpp
 PROJECTMANAGER=App/ProjectManager.cpp

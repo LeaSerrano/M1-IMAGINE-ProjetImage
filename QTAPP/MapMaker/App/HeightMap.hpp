@@ -141,12 +141,14 @@ public:
         return outImg;
     }
 
-    static ImageBase* seaBinaryMap(ImageBase* heightMap)
+    static ImageBase* seaBinaryMap(ImageBase* heightMap,bool useDefaults)
     {
         ImageBase* outImg = new ImageBase(heightMap->getWidth(),heightMap->getHeight(),false);
 
         float sea_level = Utilities::quantile(heightMap,suggestedSeaRatio) / 255.0;
-        sea_level = DataManager::instance->requestValue("sea_level",sea_level,true);
+        if(!useDefaults) sea_level = DataManager::instance->requestValue("sea_level",sea_level,true);
+        else DataManager::instance->setValue("sea_level",sea_level);
+
         for(int i = 0; i < heightMap->getSize();i++)
         {
             if(heightMap->get(i,0) / 255.0 < sea_level)
