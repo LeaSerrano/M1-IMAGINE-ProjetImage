@@ -22,6 +22,7 @@
 #include "./App/ProjectManager.h"
 #include "./App/DataManager.hpp"
 #include "./App/MapManager.h"
+#include "./App/PointOfInterestMap.hpp"
 
 #include <vector>
 
@@ -48,6 +49,8 @@ private slots:
 
     void on_saveMapButton_clicked();
 
+    void on_finalButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QString projectPath = "";
@@ -57,11 +60,14 @@ private:
     MapManager* mapManager;
 
     vector<QPushButton*> mapDisplayers;
+    vector<QPushButton*> interestTypesButtons;
 
     vector<QHBoxLayout*> dataInputLayouts;
+    vector<InterestPoint*> interestPoints; string interestType;
+    vector<QLabel*> interestLabels;
 
-    string currentMap;
-    int mapStatus;
+    string currentMap; bool autoroutine;
+    int mapStatus; bool displayFinal;
 
     void routine();
 
@@ -69,6 +75,7 @@ private:
 
     void displayMap(QString mapPath, QPushButton* label);
     void displayMaps();
+    void displayFinalMap();
 
     void updateCurrentMap(string id);
 

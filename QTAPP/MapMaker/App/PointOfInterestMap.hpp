@@ -44,8 +44,11 @@ struct InterestPoint
     string name;
 
     vector<Point> points;
+    int size;
     int x,y;
 };
+
+#define pointRadius 4
 
 #define waterfallValue 128
 #define harborValue 255
@@ -72,6 +75,13 @@ public:
         {harborValue,"harbor"},
         {meadowValue,"meadow"},
         {lakeValue,"lake"}
+    };
+
+    static inline vector<vector<string>> nameParts =
+    {
+            {"Da","La","Mo","Fe","Ko","Pi","Ku","He"},
+            {"mi","lo","la","ma","me","le","pa","pe","po","na","ni"},
+            {"da","er","pit","mot","ger","bat"}
     };
 
 
@@ -408,25 +418,58 @@ public:
             }
             ip->x = (int)(x/(double)ip->points.size());
             ip->y = (int)(y/(double)ip->points.size());
+            ip->size = ip->points.size();
 
             ip->name = generateName(ip);
 
-            flux << i << " " << ip->stringId << " " << 
+            flux << i << " " << ip->stringId << " " <<
                 ip->name << " " <<
-                ip->x << ":" << ip->y <<
+                ip->x << ":" << ip->y << ":" << ip->size <<
                 std::endl;
             i++;
         }
     }
 
-    static string generateName(InterestPoint* ip)
+    static string generateRandomName()
     {
-        return "test";
+        string str = "";
+
+        for(int i = 0; i < nameParts.size();i++)
+        {
+            int n = (rand() / (float)RAND_MAX) * nameParts.at(i).size();
+            str += nameParts.at(i).at(n);
+        }
+
+        return str;
     }
 
-    static ImageBase* generatePoints(ImageBase* interestMap)
+    static string generateName(InterestPoint* ip)
     {
-        ImageBase* image = new ImageBase(interestMap->getWidth(),interestMap->getHeight(),false);
+        return ip->stringId + "_of_" + generateRandomName();
+    }
+
+    static void drawPoint(ImageBase* map, int x, int y, double radius)
+    {
+        int r = (int)radius;
+        for(int dx = -r; dx <= r; dx++)
+        {
+            for(int dy = -r; dy <= r; dy++)
+            {
+                if(x + dx < 0 || x + dx >= map->getWidth() || y + dy < 0 || y + dy >= map->getHeight()){continue;}
+
+                float d = sqrt((dx*dx) + (dy*dy));
+
+                if(d <= radius)
+                {
+                    map->set(x + dx,y + dy,0,255);
+                }
+            }
+        }
+    }
+
+    static vector<InterestPoint*> generatePointsList()
+    {
+        vector<InterestPoint*> list ;
 
         ifstream inFile;
         inFile.open(ProjectManager::instance->projectPath() + "/" + PointsFileName); //open the input file
@@ -436,29 +479,53 @@ public:
 
         string ipStr;
 
+
         while(std::getline(strStream, ipStr, '\n'))
         {
             stringstream ipSS; ipSS << ipStr;
-            vector<stringstream*> values; string value; stringstream* svalue; 
+            vector<stringstream*> values; string value; stringstream* svalue;
             while(std::getline(ipSS, value, ' '))
             {
                 svalue = new stringstream(); *svalue << value;
-                values.push_back(svalue);            
+                values.push_back(svalue);
             }
 
             string type = values.at(1)->str();
             string name = values.at(2)->str();
             stringstream* coords = values.at(3);
 
-            string coord; int x,y; int i = 0;
+            string coord; int x,y,size; int i = 0;
             while(std::getline(*coords, coord, ':'))
             {
                 if(i==0){x = stoi(coord);}
                 if(i==1){y = stoi(coord);}
+                if(i==2){size = stoi(coord);}
                 i++;
             }
 
-            cout << type << " | " << name << " | <" << x << ":" << y << ">" << endl;
+            replace(name.begin(), name.end(), '_', ' ');
+
+            InterestPoint* ip = new InterestPoint();
+            ip->x = x; ip->y = y; ip->size = size;
+            ip->name = name; ip->stringId = type;
+
+            list.push_back(ip);
+        }
+
+        return list;
+    }
+
+    static ImageBase* generatePoints(ImageBase* interestMap)
+    {
+        ImageBase* image = new ImageBase(interestMap->getWidth(),interestMap->getHeight(),false);
+
+        vector<InterestPoint*> list = generatePointsList();
+        double mapSize = DataManager::instance->requestValue("map_size");
+
+        for(int i = 0; i < list.size();i++)
+        {
+            double r = (mapSize / 2048.0) * pointRadius * max(1.0,sqrt(list.at(i)->size)/10.0);
+            drawPoint(image,list.at(i)->x, list.at(i)->y,r);
         }
 
         return image;

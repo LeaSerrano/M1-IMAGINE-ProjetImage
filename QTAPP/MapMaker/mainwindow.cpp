@@ -37,6 +37,7 @@ void MainWindow::on_actionOpen_Project_triggered()
 
 void MainWindow::clickOnMap(string mapId)
 {
+    autoroutine = false;
     updateCurrentMap(mapId);
 }
 
@@ -58,7 +59,7 @@ void MainWindow::updateCurrentMap(string id)
         ui->currentMap->clear();
         ui->currentMap->setText(mapStatus == 1 ? "Generating..." : "NO DATA\nClick on 'Generate' to launch the generation process");
     }
-
+    
     ui->currentMapLabel->setText(QString::fromStdString(currentMap));
 }
 
@@ -70,7 +71,7 @@ void MainWindow::displayMap(QString mapPath,QPushButton* button)
 
 void MainWindow::displayMaps()
 {
-    int size = (int)(ui->mapDisplayers->geometry().width() * 0.45); //ui->mapDisplayers->geometry().height() / MapManager::instance->maps.size();
+    int size = (int)(ui->mapDisplayers->geometry().width() * 0.3); //ui->mapDisplayers->geometry().height() / MapManager::instance->maps.size();
     int colCount = (int)(ui->mapDisplayers->geometry().height() / (float)size);
     int c = 0;
     for (map<string,ImageBase*>::const_iterator it=MapManager::instance->maps.begin(); it!=MapManager::instance->maps.end(); it++)
@@ -162,24 +163,99 @@ bool MainWindow::checkData()
     return b;
 }
 
+void MainWindow::displayFinalMap()
+{
+    int width = ui->currentMap->width();
+    int height = ui->currentMap->height();
+
+    QPoint point = ui->currentMap->mapToGlobal(QPoint(0,0));
+    int tcx = point.x();// - (width * 0.85);
+    int tcy = point.y();// - ((height * 0.9)/2.0);
+
+    if(interestTypesButtons.size() <= 0)
+    {
+        int c = 0;
+        for (unordered_map<int,string>::const_iterator it=PointOfInterestMap::interestTypes.begin(); it!=PointOfInterestMap::interestTypes.end(); it++)
+        {
+            QPushButton* button = new QPushButton(this);
+
+            button->setText(QString::fromStdString(it->second));
+            button->setMinimumSize(50,25);button->setMaximumSize(50,25);
+            connect(button, &QPushButton::clicked, this, [=]()
+                    {
+                        interestType = (interestType == it->second) ? "_" : it->second; //Allows to hide points if clicked a second time of the same button
+                    });
+
+            interestTypesButtons.push_back(button);
+            ui->interestTypesButtons->addWidget(button);
+            c++;
+        }
+    }
+
+    interestPoints = PointOfInterestMap::generatePointsList();
+
+    do
+    {
+        if(interestType != "")
+        {
+            for(int i = 0; i < interestLabels.size(); i++) { delete interestLabels.at(i);}
+            interestLabels.clear();
+
+            for(int i = 0; i < interestPoints.size(); i++)
+            {
+                if(interestPoints.at(i)->stringId == interestType)
+                {
+                    int x = (interestPoints.at(i)->x / dataManager->getValue("map_size")) * width;
+                    int y = (interestPoints.at(i)->y / dataManager->getValue("map_size")) * height;
+                    float dx = interestPoints.at(i)->name.size()*6;
+
+                    QLabel* pointLabel = new QLabel(this);
+                    pointLabel->setText(interestPoints.at(i)->name.c_str());
+                    pointLabel->setStyleSheet("QLabel { background-color : white; color : black; }");
+                    pointLabel->setGeometry(tcx + x - (dx/2.0),tcy + y,dx,10);
+                    pointLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+                    pointLabel->setFont(QFont("Arial", 6, QFont::Bold));
+                    pointLabel->show();
+                    interestLabels.push_back(pointLabel);
+                }
+            }
+
+            interestType = "";
+        }
+
+        QEventLoop loop;
+        QTimer::singleShot(100, &loop, &QEventLoop::quit); // Pause for 1 second
+        loop.exec();
+    }while(displayFinal);
+}
+
 void MainWindow::routine()
 {
     setupUI();
 
-    int currentMapId = 0;
+    int currentMapId = 0; autoroutine = true;
     while(currentMapId < MapManager::mapIdCount)
     {
-        if(mapManager->mapExists(MapManager::mapIds[currentMapId])){currentMapId++; continue;}
-
-        mapStatus = 0; updateCurrentMap(MapManager::mapIds[currentMapId]);
-        if(!mapManager->mapExists(MapManager::mapIds[currentMapId]) && (MapManager::mapPreGenerate[currentMapId] || MapManager::mapDatas[MapManager::mapIds[currentMapId]].size() <= 0))
+        if(autoroutine)
         {
+            currentMap = MapManager::mapIds[currentMapId];
+            if(mapManager->mapExists(currentMap)){currentMapId++; continue;}
+        }
+
+        mapStatus = 0; updateCurrentMap(currentMap);
+        if(autoroutine && !mapManager->mapExists(currentMap) && (MapManager::mapPreGenerate[currentMapId] || MapManager::mapDatas[MapManager::mapIds[currentMapId]].size() <= 0))
+        {
+            mapStatus = 1;
+            updateCurrentMap(MapManager::mapIds[currentMapId]);
             mapManager->generateMap(currentMap);
         }
         setupDataInput();
         do
         {
-            updateCurrentMap(MapManager::mapIds[currentMapId]);
+            if(!displayFinal)
+            {
+                updateCurrentMap(currentMap);
+            }
 
             QEventLoop loop;
             QTimer::singleShot(100, &loop, &QEventLoop::quit); // Pause for 1 second
@@ -219,5 +295,12 @@ void MainWindow::on_saveMapButton_clicked()
 
     mapManager->saveMap(currentMap);
     mapStatus = 2;
+}
+
+
+void MainWindow::on_finalButton_clicked()
+{
+    displayFinal = true;
+    displayFinalMap();
 }
 
