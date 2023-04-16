@@ -43,7 +43,7 @@ public:
         "HEIGHT_LARGE","HEIGHT_SMALL","HEIGHT_BASE","SEA_BINARY","HEIGHT_SEA","HEIGHT_LAND","HEIGHT_GRADIENT",
         "RIVER",
         "RELIEF",
-        "CLIMATE","BIOME",
+        "CLIMATE", "BIOME",
         "INTEREST","INTEREST_C","INTEREST_POINTS"
         };
 

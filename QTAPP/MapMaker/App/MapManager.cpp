@@ -85,7 +85,7 @@ ImageBase* MapManager::generateMap(string id)
 
         case "CLIMATE"_sh: maps[id] = ClimateMap::generateClimateMap(); break;
 
-        case "BIOME"_sh: maps[id] = BiomeMap::generatePlainBiomeMap(requestMap("RELIEF"), requestMap("CLIMATE"),maps.count(id) <= 0); break;
+        case "BIOME"_sh: maps[id] = BiomeMap::smoothBordersBiome(requestMap("RELIEF"), requestMap("CLIMATE"),maps.count(id) <= 0); break;
     }
     return maps[id] ;
 }
