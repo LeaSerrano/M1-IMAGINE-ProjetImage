@@ -175,20 +175,23 @@ void MainWindow::displayFinalMap()
     if(interestTypesButtons.size() <= 0)
     {
         int c = 0;
-        for (unordered_map<int,string>::const_iterator it=PointOfInterestMap::interestTypes.begin(); it!=PointOfInterestMap::interestTypes.end(); it++)
+        for (unordered_map<string,vector<string>>::const_iterator it=PointOfInterestMap::interestTypes.begin(); it!=PointOfInterestMap::interestTypes.end(); it++)
         {
-            QPushButton* button = new QPushButton(this);
+            for(string ip : it->second)
+            {
+                QPushButton* button = new QPushButton(this);
 
-            button->setText(QString::fromStdString(it->second));
-            button->setMinimumSize(50,25);button->setMaximumSize(50,25);
-            connect(button, &QPushButton::clicked, this, [=]()
-                    {
-                        interestType = (interestType == it->second) ? "_" : it->second; //Allows to hide points if clicked a second time of the same button
-                    });
+                button->setText(QString::fromStdString(ip));
+                button->setMinimumSize(50,25);button->setMaximumSize(50,25);
+                connect(button, &QPushButton::clicked, this, [=]()
+                        {
+                            interestType = (interestType == ip) ? "_" : ip; //Allows to hide points if clicked a second time of the same button
+                        });
 
-            interestTypesButtons.push_back(button);
-            ui->interestTypesButtons->addWidget(button);
-            c++;
+                interestTypesButtons.push_back(button);
+                ui->interestTypesButtons->addWidget(button);
+                c++;
+            }
         }
     }
 

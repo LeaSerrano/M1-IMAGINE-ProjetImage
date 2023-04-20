@@ -29,9 +29,9 @@ public:
     inline static Color desert_hills_color = Color(255,200,50);;
     inline static Color desert_plateau_color = Color(150,100,80);;
 
-    inline static Color jungle_plain_color = Color(4, 110, 8);;
-    inline static Color jungle_hills_color = Color(15, 94, 17);;
-    inline static Color jungle_plateau_color = Color(76, 63, 19);;
+    inline static Color jungle_plain_color = Color(30, 180, 40);
+    inline static Color jungle_hills_color = Color(50, 120, 45);
+    inline static Color jungle_plateau_color = Color(85, 100, 35);
 
     inline static Color snow_plain_color = Color(250,250,255);;
     inline static Color snow_hills_color = Color(188, 188, 209);;

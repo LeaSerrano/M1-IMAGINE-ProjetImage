@@ -5,6 +5,7 @@
 #include "Utilities.hpp"
 #include "DataManager.hpp"
 #include "ProjectManager.h"
+#include "BiomeMap.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +30,12 @@ struct Couleur {
     int r;
     int g;
     int b;
+
+    Couleur(){}
+    Couleur(int _r, int _g, int _b)
+    {
+        r = _r; g = _g; b = _b;
+    }
 
     bool operator==(const Couleur& other) const {
         return (r == other.r && g == other.g && b == other.b);
@@ -58,6 +65,9 @@ struct InterestPoint
 #define meadowAltitudeDiff 1
 #define meadowRatio 0.75
 
+#define forest_occurence 0.5
+#define city_occurence 0.5
+
 #define lakeValue 30
 #define lakeExtend 8
 
@@ -69,12 +79,20 @@ class PointOfInterestMap
 public:
     
 
-    static inline unordered_map<int,string> interestTypes = 
+    static inline unordered_map<int,string> interestBaseTypes =
     {
         {waterfallValue,"waterfall"},
         {harborValue,"harbor"},
         {meadowValue,"meadow"},
         {lakeValue,"lake"}
+    };
+
+    static inline unordered_map<string,vector<string>> interestTypes =
+        {
+            {"waterfall",{"waterfall"}},
+            {"harbor",{"harbor","mouth"}},
+            {"meadow",{"meadow","city","forest"}},
+            {"lake",{"lake"}}
     };
 
     static inline vector<vector<string>> nameParts =
@@ -323,7 +341,7 @@ public:
         return labels;
     }
 
-    static ImageBase* generatePointOfInterestMapColored(ImageBase* image)
+    static ImageBase* generatePointOfInterestMapColored(ImageBase* image,ImageBase* biomeMap)
     {
         int width = DataManager::instance->requestValue("map_size"); 
         int height = width;
@@ -381,7 +399,8 @@ public:
                 }
 
             InterestPoint* ip = new InterestPoint();
-            ip->intId = image->get(val[0].x,val[0].y,0); ip->stringId = interestTypes[ip->intId];
+            ip->intId = image->get(val[0].x,val[0].y,0);
+            ip->stringId = interestBaseTypes[ip->intId];
             ip->color = c;
 
             for (auto const& point : val) {
@@ -399,12 +418,48 @@ public:
             c.b = rand() % ((255 - 0) + 1) + 0;
         }
 
-        generatePointsData(interestPoints,imageColor,image);
+        generatePointsData(interestPoints,imageColor,image,biomeMap);
 
         return imageColor;
     }
 
-    static void generatePointsData(vector<InterestPoint*> interestPoints,ImageBase* zones, ImageBase* points)
+    static void chooseIpType(InterestPoint* ip,ImageBase* biomeMap)
+    {
+        if(ip->stringId == "waterfall" || ip->stringId == "lake")
+        {
+
+        }
+        else if(ip->stringId == "harbor")
+        {
+            int r =  (rand() / (float)RAND_MAX) * interestTypes["harbor"].size();
+            ip->stringId = interestTypes["harbor"].at(r);
+        }
+        else if(ip->stringId == "meadow")
+        {
+            float p = (rand() / (float)RAND_MAX);
+            if( p < forest_occurence &&
+                !BiomeMap::isTheSameColor(ip->x,ip->y,biomeMap,BiomeMap::desert_plain_color) &&
+                !BiomeMap::isTheSameColor(ip->x,ip->y,biomeMap,BiomeMap::desert_hills_color) &&
+                !BiomeMap::isTheSameColor(ip->x,ip->y,biomeMap,BiomeMap::desert_plateau_color)&&
+                !BiomeMap::isTheSameColor(ip->x,ip->y,biomeMap,BiomeMap::ice_plain_color) &&
+                !BiomeMap::isTheSameColor(ip->x,ip->y,biomeMap,BiomeMap::ice_hills_color) &&
+                !BiomeMap::isTheSameColor(ip->x,ip->y,biomeMap,BiomeMap::ice_plateau_color))
+            {
+                ip->stringId = "forest"; return;
+            }
+             p = (rand() / (float)RAND_MAX);
+            if( p < city_occurence &&
+                 !BiomeMap::isTheSameColor(ip->x,ip->y,biomeMap,BiomeMap::desert_hills_color) &&
+                  !BiomeMap::isTheSameColor(ip->x,ip->y,biomeMap,BiomeMap::jungle_hills_color) &&
+                  !BiomeMap::isTheSameColor(ip->x,ip->y,biomeMap,BiomeMap::snow_hills_color) &&
+                 !BiomeMap::isTheSameColor(ip->x,ip->y,biomeMap,BiomeMap::ice_hills_color ))
+             {
+                ip->stringId = "city"; return;
+             }
+        }
+    }
+
+    static void generatePointsData(vector<InterestPoint*> interestPoints,ImageBase* zones, ImageBase* points,ImageBase* biomeMap)
     {
         ofstream flux(ProjectManager::instance->projectPath() + "/" + PointsFileName);
 
@@ -420,9 +475,11 @@ public:
             ip->y = (int)(y/(double)ip->points.size());
             ip->size = ip->points.size();
 
+            chooseIpType(ip,biomeMap);
+
             ip->name = generateName(ip);
 
-            flux << i << " " << ip->stringId << " " <<
+            flux << i << " " << ip->stringId << " " << ip->color.r << ":" << ip->color.g << ":" << ip->color.b << " " <<
                 ip->name << " " <<
                 ip->x << ":" << ip->y << ":" << ip->size <<
                 std::endl;
@@ -491,8 +548,9 @@ public:
             }
 
             string type = values.at(1)->str();
-            string name = values.at(2)->str();
-            stringstream* coords = values.at(3);
+            stringstream* colors = values.at(2);
+            string name = values.at(3)->str();
+            stringstream* coords = values.at(4);
 
             string coord; int x,y,size; int i = 0;
             while(std::getline(*coords, coord, ':'))
@@ -503,10 +561,20 @@ public:
                 i++;
             }
 
+            string color; int r,b,g; i = 0;
+            while(std::getline(*colors, color, ':'))
+            {
+                if(i==0){r = stoi(color);}
+                if(i==1){g = stoi(color);}
+                if(i==2){b = stoi(color);}
+                i++;
+            }
+
             replace(name.begin(), name.end(), '_', ' ');
 
             InterestPoint* ip = new InterestPoint();
             ip->x = x; ip->y = y; ip->size = size;
+            ip->color = Couleur(r,g,b);
             ip->name = name; ip->stringId = type;
 
             list.push_back(ip);

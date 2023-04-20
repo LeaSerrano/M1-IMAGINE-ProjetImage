@@ -38,13 +38,14 @@ class MapManager
 
 public:
 
-    static const int mapIdCount = 14;
+    static const int mapIdCount = 15;
     static inline string mapIds[] = {
         "HEIGHT_LARGE","HEIGHT_SMALL","HEIGHT_BASE","SEA_BINARY","HEIGHT_SEA","HEIGHT_LAND","HEIGHT_GRADIENT",
         "RIVER",
         "RELIEF",
         "CLIMATE", "BIOME",
-        "INTEREST","INTEREST_C","INTEREST_POINTS"
+        "INTEREST","INTEREST_C","INTEREST_POINTS",
+        "FINAL"
         };
 
     static inline bool mapPreGenerate[] = {
@@ -68,10 +69,11 @@ public:
         mapDatas["RIVER"] = {};
         mapDatas["RELIEF"] =  {};
         mapDatas["INTEREST"] =  {};
-        mapDatas["INTEREST_C"] =  {};
-        mapDatas["INTEREST_POINTS"] =  {};
         mapDatas["CLIMATE"] =  {};
         mapDatas["BIOME"] =  {"desert_temperature","ice_temperature","high_humidity","low_humidity"};
+        mapDatas["INTEREST_C"] =  {};
+        mapDatas["INTEREST_POINTS"] =  {};
+        mapDatas["FINAL"] = {};
     }
 
     map<string,ImageBase*> maps;

@@ -31,7 +31,8 @@ HEADERS += \
     ./Library/PerlinNoise.hpp \
     ./App/PointOfInterestMap.hpp \
     ./App/ClimateMap.hpp \
-    ./App/BiomeMap.hpp
+    ./App/BiomeMap.hpp \
+    ./App/FinalMap.hpp
 
 FORMS += \
     mainwindow.ui

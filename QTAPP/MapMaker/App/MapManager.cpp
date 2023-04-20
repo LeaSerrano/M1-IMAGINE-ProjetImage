@@ -15,6 +15,7 @@
 #include "PointOfInterestMap.hpp"
 #include "ClimateMap.hpp"
 #include "BiomeMap.hpp"
+#include "FinalMap.hpp"
 
 #include "../Library/ImageBase.h"
 #include "../Library/PerlinNoise.hpp"
@@ -79,13 +80,15 @@ ImageBase* MapManager::generateMap(string id)
 
         case "RELIEF"_sh: maps[id] = ReliefMap::reliefMap(requestMap("HEIGHT_GRADIENT"),requestMap("HEIGHT_BASE"),requestMap("SEA_BINARY"),requestMap("RIVER")); break;
 
-        case "INTEREST"_sh: maps[id] = PointOfInterestMap::generatePointOfInterestMapGray(requestMap("HEIGHT_GRADIENT"),requestMap("RIVER"), requestMap("SEA_BINARY"), requestMap("RELIEF"), requestMap("HEIGHT_BASE")); break;
-        case "INTEREST_C"_sh: maps[id] = PointOfInterestMap::generatePointOfInterestMapColored(requestMap("INTEREST")); break;
-        case "INTEREST_POINTS"_sh: maps[id] = PointOfInterestMap::generatePoints(requestMap("INTEREST_C")); break;
-
         case "CLIMATE"_sh: maps[id] = ClimateMap::generateClimateMap(); break;
 
         case "BIOME"_sh: maps[id] = BiomeMap::smoothBordersBiome(requestMap("RELIEF"), requestMap("CLIMATE"),maps.count(id) <= 0); break;
+
+        case "INTEREST"_sh: maps[id] = PointOfInterestMap::generatePointOfInterestMapGray(requestMap("HEIGHT_GRADIENT"),requestMap("RIVER"), requestMap("SEA_BINARY"), requestMap("RELIEF"), requestMap("HEIGHT_BASE")); break;
+        case "INTEREST_C"_sh: maps[id] = PointOfInterestMap::generatePointOfInterestMapColored(requestMap("INTEREST"),requestMap("BIOME")); break;
+        case "INTEREST_POINTS"_sh: maps[id] = PointOfInterestMap::generatePoints(requestMap("INTEREST_C")); break;
+
+        case "FINAL"_sh: maps[id] = FinalMap::generate(requestMap("BIOME"),requestMap("INTEREST_C")); break;
     }
     return maps[id] ;
 }
