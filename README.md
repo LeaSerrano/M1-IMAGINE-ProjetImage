@@ -1,4 +1,4 @@
-# M1-IMAGINE-ProjetImage
+# M1 IMAGINE Projet Image
 
 Ce projet s'inscrit dans le contexte du module HAI809 - Traitement d'images en M1 IMAGINE.
 C'est un projet réalisé en binôme aléatoire, il a été réalisé en c++ et l'interface a été réalisé avec QT.
