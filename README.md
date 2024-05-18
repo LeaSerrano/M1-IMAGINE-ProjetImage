@@ -1,4 +1,4 @@
-# M1 IMAGINE Projet Image
+# Projet Image
 
 [FR]
 
